@@ -6,19 +6,19 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/webkit:1/web/http/mimetype-const)
+ (only-in (planet rpr/httpclient:1/http/mimetype-const)
 	  X-WWW-FORM-URLENCODED)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  Params Param params->query)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header header->string content-type)
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  Uri Uri-path make-uri
 	  url-encode-string uri->string)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPConnection-in
 	  HTTPPayload http-invoke)
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
  (only-in "../../auth/authv2.rkt"
 	  authv2-signature)

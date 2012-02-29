@@ -9,13 +9,13 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  make-uri Uri Uri-path)
- (only-in (planet knozama/common:1/type/date)
+ (only-in (planet rpr/prelude:1/type/date)
 	  current-date-string-rfc-2822)
- (only-in (planet knozama/webkit:1/web/http/heading)
+ (only-in (planet rpr/httpclient:1/http/heading)
 	  DATE HOST)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
 	  Header Headers
 	  header->string
 	  make-header
@@ -23,16 +23,16 @@
 	  content-length
 	  content-type
 	  content-md5)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  Params
 	  params->query)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  Action HTTPPayload HTTPPayload-md5 HTTPPayload-mime
 	  http-action->string http-status-code http-has-content?
 	  ResponseHeader-result Result
 	  HTTPConnection-in HTTPConnection-header
 	  http-invoke http-close-connection make-client-error-response)
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath 
 	  sxpath xml->sxml select-single-node-text)
  (only-in "../credential.rkt"

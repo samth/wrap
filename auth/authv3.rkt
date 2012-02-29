@@ -5,21 +5,21 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/common:1/text/util)
+ (only-in (planet rpr/prelude:1/text/util)
 	  weave-string-separator)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
 	  header->string)
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  url-encode-string)
- (only-in (planet knozama/webkit:1/crypto/hash/sha256)
+ (only-in (planet rpr/crypto:1/hash/sha256)
 	  sha256)
- (only-in (planet knozama/webkit:1/crypto/base64)
+ (only-in (planet rpr/crypto:1/base64)
 	  base64-encode)
- (only-in (planet knozama/webkit:1/crypto/hmac)
+ (only-in (planet rpr/crypto:1/hmac)
 	  hmac-sha256)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  param Param Params)
- (only-in (planet knozama/aws:1/credential)
+ (only-in "../credential.rkt"
 	  AwsCredential-session BaseCredential-secret-key current-aws-credential))
 
 (: filter-canonicalize-headers (Params -> Params))
@@ -72,21 +72,3 @@
       ;;(pretty-print signee)
       (base64-encode (hmac-sha256 secret-key (sha256 signee))))))
   
-;; (require
-;;  (only-in (planet knozama/common:1/type/date)
-;; 	  current-time-rfc-2822
-;; 	  current-time-iso-8601))
-
-;; (: auth-headers (String -> Params))
-;; (define (auth-headers tok)
-;;   (list 
-;;    (cons "host" "someawshost")
-;;    (cons "x-amZ-security-token" tok)
-;;    (cons "x-amZ-security-token" "tokabc")
-;;    (cons "x-amz-date" (current-time-rfc-2822))
-;;    (cons "x-amz-target" "DynamoDB_20111205.ListTables")))
-
-;; (define (test)
-;;   (pretty-print (auth-signee "rayhost" (filter-canonicalize-headers (auth-headers "tok123"))))
-;;   (pretty-print (auth-signature "rayhost" (filter-canonicalize-headers (auth-headers "tok123")))))
-

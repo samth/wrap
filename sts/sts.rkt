@@ -5,15 +5,15 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  Uri make-uri uri->string)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  Param Params params->query)
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath sxpath xml->sxml extract-text extract-integer)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header)
  (only-in "../credential.rkt"
   	  SessionCredential SessionCredential?)

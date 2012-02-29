@@ -5,7 +5,7 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath 
 	  sxpath xml->sxml select-single-node-text)
  (only-in "types.rkt" 

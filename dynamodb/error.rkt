@@ -30,7 +30,7 @@
 
 (require 
  racket/pretty
- (only-in (planet knozama/webkit:1/formats/tjson)
+ (only-in (planet rpr/format:1/json/tjson)
  	  Json JsObject JsObject? json->string string->json jsobject))
  	
 (struct: DDBFailure exn:fail () #:transparent)
@@ -51,7 +51,7 @@
 (define-syntax throw
   (syntax-rules ()
     ((throw excn)
-     (raise (ddb-failure excn)))))  ;; FIXME - Should be bug in TR: (raise (ddb-exception excn) #t))))
+     (raise (ddb-failure excn #t)))))  ;; FIXME - Should be bug in TR: (raise (ddb-exception excn) #t))))
 
 (: is-exception-response? (JsObject -> Boolean))
 (define (is-exception-response? jsobj)

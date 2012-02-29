@@ -23,11 +23,11 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/webkit:1/formats/tjson)
+ (only-in (planet rpr/format:1/json/tjson)
 	  JsObject-empty
  	  Json JsObject JsObject? json->string string->json jsobject
 	  jsobject-add-attribute jsobject-remove-attribute)
- (only-in (planet knozama/common:1/std/opt)
+ (only-in (planet rpr/prelude:1/std/opt)
 	  opt-orelse)
  (only-in "types.rkt"
 	  ddbtype-symbol DDBType

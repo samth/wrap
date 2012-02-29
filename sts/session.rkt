@@ -5,7 +5,7 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/common:1/type/date)
+ (only-in (planet rpr/prelude:1/type/date)
 	  time< current-time)
  (only-in "../credential.rkt"
 	  set-aws-credential! add-session-credential

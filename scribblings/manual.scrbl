@@ -5,7 +5,7 @@
        (require (for-label (only-meta-in 0 typed/racket)))]
        
 @title[#:tag "top"]{@bold{AWS}: SQS - Amazon WebServices}
-@declare-exporting[(planet knozama/aws:1)]
+@declare-exporting[(planet rpr/aws:1)]
 
 by Ray Racine (@tt{ray dot racine at gmail dot com})
 
@@ -18,7 +18,7 @@ This library provides integration to various Amazon AWS cloud services.
 
 @subsection{Configuration}
 
-@defmodule[(planet knozama/aws/sqs/config)]{
+@defmodule[(planet rpr/aws/sqs/config)]{
 
 Currently SQS configuration is hardcoded in a "config.rkt" file and reviewed and modified to suit.
 
@@ -52,7 +52,7 @@ Currently this library expects and requires that a valid set of credentials is l
 
 @subsubsection{AWS Credentials}
 
-@defmodule[(planet knozama/aws/credential)]
+@defmodule[(planet rpr/aws/credential)]
 
 @defproc[(current-aws-credential) (Parameterof AwsCredential)]{
 A parameterization containing the credentials used by this library authorizing an AWS call.  An initial set of credential information is loaded during module initialization from a given path.  Module initialization will fail if the expected credential file is not found.
@@ -98,7 +98,7 @@ Utility procedure to set the @racket{current-aws-credential} parameter.  Not req
 
 
 @subsection{STS}
-@defmodule[(planet knozama/aws/sts/stc)]
+@defmodule[(planet rpr/aws/sts/stc)]
 
 @defproc[(get-session-token [duration-secs Exact-Nonnegative-Integer]) SessionCredential]{
 Obtains a session token valid for the given duration in seconds from the AWS STS service.
@@ -187,7 +187,7 @@ Deletes an S3 stored object.
 
 @subsection{SQS}
 
-@defmodule[(planet knozama/aws/sqs/sqs)]
+@defmodule[(planet rpr/aws/sqs/sqs)]
 
 @defproc[(list-queues [prefix (Option String)]) (U SQSError SQSListQueuesResp)]{
 List all SQS queues.  If the optional prefix is provided only those queues starting

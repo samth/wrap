@@ -5,7 +5,7 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/webkit:1/formats/tjson)
+ (only-in (planet rpr/format:1/json/tjson)
 	  Json JsObject jsobject json->string)
  (only-in "action.rkt"
 	  UPDATE-ITEM)

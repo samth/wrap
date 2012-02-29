@@ -24,22 +24,22 @@
  racket/pretty
  (only-in racket/port
 	  call-with-input-bytes)
- (only-in (planet knozama/common:1/std/control)
+ (only-in (planet rpr/prelude:1/std/control)
 	  aif)
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  Uri Uri-query make-uri parse-uri
 	  url-encode-string uri->string)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPPayload HTTPConnection-in 
 	  http-successful? http-close-connection http-invoke)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  param Param Params encode-param)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
           Header Headers make-header)
- (only-in (planet knozama/common:1/type/date)
+ (only-in (planet rpr/prelude:1/type/date)
 	  current-date-string-rfc-2822
 	  current-date-string-iso-8601)
- (only-in (planet knozama/webkit:1/formats/tjson)
+ (only-in (planet rpr/format:1/json/tjson)
 	  Json JsObject JsObject? read-json write-json)
  (only-in "error.rkt"
 	  DDBFailure DDBFailure? ddb-failure
@@ -50,7 +50,7 @@
 	  auth-signature)
  (only-in "config.rkt"
 	  ddb-host)
- (only-in (planet knozama/aws:1/credential)
+ (only-in (planet rpr/aws:1/credential)
 	  SessionCredential SessionCredential?
 	  AwsCredential-session AwsCredential? BaseCredential-secret-key BaseCredential-access-key
 	  SessionCredential-token current-aws-credential))

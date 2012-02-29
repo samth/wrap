@@ -5,11 +5,11 @@
 
 (require
  racket/pretty 
- (only-in (planet knozama/common:1/type/date)
+ (only-in (planet rpr/prelude:1/type/date)
 	  date->time-utc iso-8601-date-string->date)
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath sxpath extract-text extract-integer)
- (only-in (planet knozama/aws:1/credential)
+ (only-in "../credential.rkt"
 	  SessionCredential current-aws-credential)
  (only-in "config.rkt"
 	  sts-ns))

@@ -8,12 +8,12 @@
  ListQueuesResp-result)
 
 (require
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath 
 	  sxpath xml->sxml select-single-node-text)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  Result)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header)
  (only-in "invoke.rkt"
 	  SQSError sqs-invoke))

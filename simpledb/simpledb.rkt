@@ -5,21 +5,21 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/common:1/std/control)
+ (only-in (planet rpr/prelude:1/std/control)
 	  aif)
- (only-in (planet knozama/aws:1/credential)
-	  BaseCredential-secret-key BaseCredential-access-key current-aws-credential)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  params->query parse-params param Param Params)
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  Uri Uri-query make-uri parse-uri
 	  url-encode-string uri->string)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header)
- (only-in (planet knozama/xml:1/sxml)
+ (only-in (planet rpr/format:1/xml/sxml)
 	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
+ (only-in "../credential.rkt"
+	  BaseCredential-secret-key BaseCredential-access-key current-aws-credential)
  (only-in "../auth/authv2.rkt"
 	  authv2-signature)
  (only-in "config.rkt"

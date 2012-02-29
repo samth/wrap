@@ -8,7 +8,7 @@
 
 (require 
  racket/pretty
- (only-in (planet knozama/webkit:1/formats/tjson)
+ (only-in (planet rpr/format:1/json/tjson)
 	  Json JsObject JsObject? JsObject-empty
 	  json->string jsobject jsobject-add-attribute)
  (only-in "action.rkt"

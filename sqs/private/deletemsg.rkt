@@ -4,9 +4,9 @@
  delete-message)
 
 (require 
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header)
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  url-encode-string)
  (only-in "invoke.rkt"
 	  SQSError sqs-invoke))

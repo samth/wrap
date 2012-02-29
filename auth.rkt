@@ -27,15 +27,15 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/common:1/text/util)
+ (only-in (planet rpr/prelude:1/text/util)
 	  weave-string-separator)
- (only-in (planet knozama/webkit:1/crypto/base64)
+ (only-in (planet rpr/crypto:1/base64)
 	  base64-encode)
- (only-in (planet knozama/webkit:1/crypto/hmac)
+ (only-in (planet rpr/crypto:1/hmac)
 	  hmac-sha1 hmac-sha256)
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  url-encode-string)
- (only-in (planet knozama/webkit:1/web/uri/url/param)
+ (only-in (planet rpr/httpclient:1/uri/url/param)
 	  params->query Param Params))
 
 (: ddb-base String)

@@ -5,12 +5,12 @@
 
 (require
  racket/pretty
- (only-in (planet knozama/webkit:1/web/uri)
+ (only-in (planet rpr/httpclient:1/uri)
 	  make-uri
 	  url-encode-string)
- (only-in (planet knozama/webkit:1/web/http/http11)
+ (only-in (planet rpr/httpclient:1/http/http11)
 	  http-invoke)
- (only-in (planet knozama/webkit:1/web/http/header)
+ (only-in (planet rpr/httpclient:1/http/header)
 	  Header
 	  Headers)
  (only-in "../credential.rkt"
