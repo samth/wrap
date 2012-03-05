@@ -12,7 +12,7 @@
 	  Sxml SXPath 
 	  sxpath xml->sxml select-single-node-text)
  (only-in (planet rpr/httpclient:1/http/http11)
-	  Result)
+	  StatusLine)
  (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header)
  (only-in "invoke.rkt"
@@ -20,7 +20,7 @@
 
 (struct: ListQueuesResp ([req-id : String]
 			 [queues : (Listof String)]
-			 [result : Result]) #:transparent)
+			 [result : StatusLine]) #:transparent)
 
 (: sqs-list-request ((Option String) -> Headers))
 (define (sqs-list-request name-prefix)

@@ -40,7 +40,7 @@
 	  content-type
 	  content-md5)
  (only-in (planet rpr/httpclient:1/http/http11)
-	  ResponseHeader Result HTTPPayload
+	  ResponseHeader HTTPPayload
 	  HTTPConnection-in HTTPConnection-header
 	  http-invoke http-close-connection make-client-error-response)
  (only-in (planet rpr/httpclient:1/uri/url/param)
