@@ -39,11 +39,11 @@
  ItemVal
  ItemUpdate
  Throughput Throughput? Throughput-read Throughput-write
- DDBFailure ConditionalCheckFailed?)
+ DDBFailure DDBFailure? ConditionalCheckFailed?)
 
 (require
  (only-in "error.rkt"
-	  DDBFailure
+	  DDBFailure DDBFailure?
 	  ConditionalCheckFailed?)
  (only-in "types.rkt"
 	  Throughput Throughput? Throughput-read Throughput-write

@@ -61,7 +61,7 @@
 				     (ReturnValues . ,(return-values-json return-values))))))
     (when expected
       (jsobject-add-attribute req 'Expected (expected/exists-json expected)))
-    (pretty-print (json->string req))
+    ;;(pretty-print (json->string req))
     (json->string req)))
 
 (: put-item (String (Listof Item) (Option (U Exists Item)) ReturnValues -> (U DDBFailure PutItemResp)))

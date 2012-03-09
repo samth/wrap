@@ -87,6 +87,7 @@
     (let ((conn (http-invoke 'POST url headers 
 			     (HTTPPayload "application/x-amz-json-1.0"
 					  #f #f (open-input-string payload)))))
+      ;;(pretty-print headers)
       (let ((json (read-json (HTTPConnection-in conn))))
 	(http-close-connection conn)
 	(if (JsObject? json)
