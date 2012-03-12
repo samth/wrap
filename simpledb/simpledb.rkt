@@ -10,8 +10,9 @@
  (only-in (planet rpr/httpclient:1/uri/url/param)
 	  params->query parse-params param Param Params)
  (only-in (planet rpr/httpclient:1/uri)
-	  Uri Uri-query make-uri parse-uri
-	  url-encode-string uri->string)
+	  Uri Uri-query make-uri parse-uri uri->string)
+ (only-in (planet rpr/httpclient:1/uri/url/encode)
+	  url-encode-string)
  (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPConnection-in http-successful? http-close-connection http-invoke)
  (only-in (planet rpr/httpclient:1/http/header)

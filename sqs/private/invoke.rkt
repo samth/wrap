@@ -13,8 +13,7 @@
  (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header header->string content-type)
  (only-in (planet rpr/httpclient:1/uri)
-	  Uri Uri-path make-uri
-	  url-encode-string uri->string)
+	  Uri Uri-path make-uri uri->string)
  (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPConnection-in
 	  HTTPPayload http-invoke)

@@ -5,9 +5,10 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/httpclient:1/uri)
-	  make-uri
+ (only-in (planet rpr/httpclient:1/uri/url/encode)
 	  url-encode-string)
+ (only-in (planet rpr/httpclient:1/uri)
+	  make-uri)
  (only-in (planet rpr/httpclient:1/http/http11)
 	  http-invoke)
  (only-in (planet rpr/httpclient:1/http/header)

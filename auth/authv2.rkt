@@ -11,7 +11,7 @@
 	  weave-string-separator)
  (only-in (planet rpr/httpclient:1/uri/url/param)
 	  param Param Params params->query)
- (only-in (planet rpr/httpclient:1/uri)
+ (only-in (planet rpr/httpclient:1/uri/url/encode)
 	  url-encode-string)
  (only-in (planet rpr/crypto:1/base64)
 	  base64-encode)

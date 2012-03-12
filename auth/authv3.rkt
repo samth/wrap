@@ -9,7 +9,7 @@
 	  weave-string-separator)
  (only-in (planet rpr/httpclient:1/http/header)
 	  header->string)
- (only-in (planet rpr/httpclient:1/uri)
+ (only-in (planet rpr/httpclient:1/uri/url/encode)
 	  url-encode-string)
  (only-in (planet rpr/crypto:1/hash/sha256)
 	  sha256)
@@ -20,7 +20,8 @@
  (only-in (planet rpr/httpclient:1/uri/url/param)
 	  param Param Params)
  (only-in "../credential.rkt"
-	  AwsCredential-session BaseCredential-secret-key current-aws-credential))
+	  AwsCredential-session BaseCredential-secret-key 
+	  current-aws-credential))
 
 (: filter-canonicalize-headers (Params -> Params))
 (define (filter-canonicalize-headers params)

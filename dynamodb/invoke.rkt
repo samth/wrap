@@ -26,9 +26,10 @@
 	  call-with-input-bytes)
  (only-in (planet rpr/prelude:1/std/control)
 	  aif)
+ (only-in (planet rpr/httpclient:1/uri/url/encode)
+	  url-encode-string)
  (only-in (planet rpr/httpclient:1/uri)
-	  Uri Uri-query make-uri parse-uri
-	  url-encode-string uri->string)
+	  Uri Uri-query make-uri parse-uri uri->string)
  (only-in (planet rpr/httpclient:1/http/http11)
 	  HTTPPayload HTTPConnection-in 
 	  http-successful? http-close-connection http-invoke)

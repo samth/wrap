@@ -33,7 +33,7 @@
 	  base64-encode)
  (only-in (planet rpr/crypto:1/hmac)
 	  hmac-sha1 hmac-sha256)
- (only-in (planet rpr/httpclient:1/uri)
+ (only-in (planet rpr/httpclient:1/uri/url/encode)
 	  url-encode-string)
  (only-in (planet rpr/httpclient:1/uri/url/param)
 	  params->query Param Params))

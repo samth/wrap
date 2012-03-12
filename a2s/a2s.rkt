@@ -21,9 +21,10 @@
 	  sxpath sxml:text srl:sxml->html)
  (only-in (planet rpr/prelude:1/text/util)
 	  weave-string-separator)
+  (only-in (planet rpr/httpclient:1/uri/url/encode)
+	   url-encode-string)
  (only-in (planet rpr/httpclient:1/uri)
-	  make-uri uri->start-line-path-string
-	  url-encode-string)
+	  make-uri uri->start-line-path-string)
  (only-in (planet rpr/httpclient:1/http/header)
 	  Header Headers host-header header->string)
  (only-in (planet rpr/httpclient:1/http/http11)
