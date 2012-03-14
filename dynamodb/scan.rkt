@@ -68,8 +68,8 @@
     (let: ((req : JsObject (jsobject req-attrs)))
       (when (null? attrs)
 	(hash-remove! req 'AttributesToGet))
-    (json->string req))))
-  
+      (json->string req))))
+
 (: parse-last-key (JsObject -> (Option ItemKey)))
 (define (parse-last-key resp)
 
@@ -87,12 +87,12 @@
 	(if (JsObject? attrs)
 	    (let ((hash-key (item-val attrs 'HashKeyElement))
 		  (range-key (item-val attrs 'RangeKeyElement)))
-	      (if (and hash-key range-key)
+	      (if hash-key
 		  (ItemKey hash-key range-key)
 		  #f))
 	    #f))
       #f))
-	      	     	        
+
 (: scan (String (Listof String) Exact-Positive-Integer Boolean (Listof Filter) (Option ItemKey) -> ScanResp))
 (define (scan table attrs limit count? filters exclusive-start-key)
   (let ((resp (dynamodb SCAN (scan-request table attrs limit count? filters exclusive-start-key))))
