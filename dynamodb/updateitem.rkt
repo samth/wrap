@@ -11,7 +11,7 @@
 	  UPDATE-ITEM)
  (only-in "types.rkt"
 	  Action action->string ddbtype-symbol
-	  KeyVal Item Item-name Item-type Item-value
+	  KeyVal Item 
 	  ItemVal ItemVal-value ItemVal-type
 	  ItemUpdate ItemUpdate-name ItemUpdate-action ItemUpdate-value 
 	  ItemKey Exists ReturnValues)
@@ -59,7 +59,8 @@
   (update-item "product" (ItemKey (KeyVal "ALENR4239" 'String)
 				  (KeyVal "UN" 'String))
 	       #f
-	       (list (ItemUpdate "odprice" (ItemVal "4.99" 'String) 'PUT))
+	       (list (ItemUpdate "odprice" (ItemVal "3.99" 'String) 'PUT)
+		     (ItemUpdate "similar" (ItemVal (list "789") 'StringSet) 'ADD))
 	       'UpdatedNew))
 
 (define (test-delete)

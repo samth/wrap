@@ -32,7 +32,7 @@
  (only-in "types.rkt"
 	  ReturnValues
 	  Exists Exists? Exists-name Exists-exists
-	  Item Item? Item-name Item-value Item-type
+	  Item Item?
 	  DDBType ddbtype-symbol)
  (only-in "error.rkt" 
 	  DDBFailure DDBFailure?)

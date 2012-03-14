@@ -106,7 +106,7 @@
 
 (struct: KeyVal ([value : String] [type : DDBType]) #:transparent)
 
-(struct: ItemVal ([value : String] [type : DDBType]) #:transparent)
+(struct: ItemVal ([value : (U (Listof String ) String)] [type : DDBType]) #:transparent)
 
 (struct: Item ([name : String] [value : String] [type : DDBType]) #:transparent)
 
