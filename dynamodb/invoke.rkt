@@ -91,7 +91,7 @@
       ;;(pretty-print headers)
       (let ((json (read-json (HTTPConnection-in conn))))
 	(http-close-connection conn)
-	(pretty-print json)
+	;;(pretty-print json)
 	(if (JsObject? json)
 	    (if (is-exception-response? json)
 		(ddb-failure json)
@@ -113,7 +113,7 @@
 
 (: dynamodb (String String -> (U DDBFailure Json)))
 (define (dynamodb cmd cmd-body)
-  (pretty-print cmd-body)
+  ;;(pretty-print cmd-body)
   (if (ensure-session)
       (let* ((scred (let ((scred (AwsCredential-session (current-aws-credential))))
 		      (if scred scred (error "Failure to obtain session credentials"))))

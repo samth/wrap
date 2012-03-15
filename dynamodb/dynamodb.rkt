@@ -33,8 +33,8 @@
  list-tables ListTablesResp
  Exists
  Key Key? Key-name Key-type
- KeyVal KeyVal?
- ItemKey ItemKey?
+ KeyVal KeyVal? KeyVal-value KeyVal-type
+ ItemKey ItemKey? ItemKey-hashkey ItemKey-rangekey
  Item Item? Item-name Item-value Item-type
  ItemVal
  ItemUpdate
@@ -48,9 +48,9 @@
  (only-in "types.rkt"
 	  Throughput Throughput? Throughput-read Throughput-write
 	  Key Key? Key-name Key-type
-	  KeyVal KeyVal?
+	  KeyVal KeyVal? KeyVal-value KeyVal-type
 	  Exists Exists? ReturnValues
-	  ItemKey ItemKey?
+	  ItemKey ItemKey? ItemKey-hashkey ItemKey-rangekey
 	  Item Item? Item-name Item-type Item-value
 	  ItemUpdate ItemVal)
  (only-in "createtable.rkt"
