@@ -11,6 +11,7 @@ Common routines for parsing DynamoDB responses.
  parse-positive-integer)
 
 (require
+ racket/pretty
  (only-in "types.rkt"
 	  ddbtype-symbol DDBType
 	  Item ItemVal KeyVal)
@@ -23,27 +24,43 @@ Common routines for parsing DynamoDB responses.
 (define (parse-fail json)
   (error "Invalid response: " (json->string json)))
 
-(: parse-item-value (Symbol Json -> String))
+(: parse-item-value (Symbol Json -> (U (Listof String) String)))
 (define (parse-item-value type json)    
   (if (JsObject? json)
       (let ((value (hash-ref json type)))
-	(if (string? value)
+	(if (or (string? value)
+		(and (list? value)
+		     (andmap string? value)))
 	    value
 	    (parse-fail json)))
-      (parse-fail json)))	  
+      (parse-fail json)))
 
 (: parse-item (String JsObject -> Item))
 (define (parse-item name json)
   (cond 
-   ((hash-has-key? json 'S) (Item name (parse-item-value 'S json) 'String))
-   ((hash-has-key? json 'N) (Item name (parse-item-value 'N json) 'Number))	
+   ((hash-has-key? json 'S) 
+    (Item name (parse-item-value 'S json) 'String))
+   ((hash-has-key? json 'N) 
+    (Item name (parse-item-value 'N json) 'Number))
+   ((hash-has-key? json 'SS) 
+    (Item name (parse-item-value 'SS json) 'StringSet))
+   ((hash-has-key? json 'SN) 
+    (Item name (parse-item-value 'SN json) 'NumberSet))
    (else (parse-fail json))))
 
 (: parse-keyval (JsObject -> KeyVal))
 (define (parse-keyval json)
   (cond 
-   ((hash-has-key? json 'S) (KeyVal (parse-item-value 'S json) 'String))
-   ((hash-has-key? json 'N) (KeyVal (parse-item-value 'N json) 'Number))
+   ((hash-has-key? json 'S) 
+    (let ((skey (parse-item-value 'S json)))
+      (if (string? skey)
+	  (KeyVal skey 'String)
+	  (parse-fail json))))
+   ((hash-has-key? json 'N) 
+    (let ((skey (parse-item-value 'N json)))
+      (if (string? skey)
+	  (KeyVal skey 'Number)
+	  (parse-fail json))))
    (else (parse-fail json))))
 
 (: parse-consumed-capacity (JsObject -> Float))

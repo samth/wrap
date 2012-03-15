@@ -108,7 +108,7 @@
 
 (struct: ItemVal ([value : (U (Listof String ) String)] [type : DDBType]) #:transparent)
 
-(struct: Item ([name : String] [value : String] [type : DDBType]) #:transparent)
+(struct: Item ([name : String] [value : (U (Listof String) String)] [type : DDBType]) #:transparent)
 
 (struct: ItemKey ([hashkey : KeyVal]
 		  [rangekey : (Option KeyVal)]) #:transparent)
