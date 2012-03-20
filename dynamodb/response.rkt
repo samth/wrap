@@ -5,7 +5,7 @@ Common routines for parsing DynamoDB responses.
 |# 
 
 (provide
- parse-fail
+ parse-fail parse-last-key
  parse-items parse-keyval
  parse-consumed-capacity
  parse-positive-integer)
@@ -14,7 +14,7 @@ Common routines for parsing DynamoDB responses.
  racket/pretty
  (only-in "types.rkt"
 	  ddbtype-symbol DDBType
-	  Item ItemVal KeyVal)
+	  Item ItemVal ItemKey KeyVal)
  (only-in (planet rpr/format:1/json/tjson)
 	  JsObject-empty
  	  Json JsObject JsObject? json->string string->json 
@@ -94,3 +94,26 @@ Common routines for parsing DynamoDB responses.
 		      (hash-set! items name (parse-item name type-value))
 		      (loop (cdr attrs)))
 		    (parse-fail jattrs)))))))
+
+(: parse-last-key (JsObject -> (Option ItemKey)))
+(define (parse-last-key resp)
+  
+  (: item-val (JsObject Symbol -> (Option KeyVal)))
+  (define (item-val resp key)
+    (if (hash-has-key? resp key)
+	(let ((key (hash-ref resp key)))
+	  (if (JsObject? key)
+	      (parse-keyval key)
+	      #f))
+	#f))
+  
+  (if (hash-has-key? resp 'LastEvaluatedKey)
+      (let ((attrs (hash-ref resp 'LastEvaluatedKey)))
+	(if (JsObject? attrs)
+	    (let ((hash-key (item-val attrs 'HashKeyElement))
+		  (range-key (item-val attrs 'RangeKeyElement)))
+	      (if hash-key
+		  (ItemKey hash-key range-key)
+		  #f))
+	    #f))
+      #f))

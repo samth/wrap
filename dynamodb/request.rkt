@@ -4,6 +4,7 @@
 
 (provide 
  item-json items-json
+ keyvalue-json
  expected/exists-json
  ;;expected-json exists-json
  return-values-json

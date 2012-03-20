@@ -20,7 +20,7 @@
 
 (provide
  LIST-TABLES CREATE-TABLE DESCRIBE-TABLE DELETE-TABLE 
- PUT-ITEM GET-ITEM DELETE-ITEM UPDATE-ITEM SCAN)
+ PUT-ITEM GET-ITEM DELETE-ITEM UPDATE-ITEM SCAN QUERY)
 
 (require 
  (only-in "config.rkt"
@@ -33,6 +33,10 @@
 (: SCAN String)
 (define SCAN
   (action "Scan"))
+
+(: QUERY String)
+(define QUERY
+  (action "Query"))
 
 (: CREATE-TABLE String)
 (define CREATE-TABLE

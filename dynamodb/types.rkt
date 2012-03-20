@@ -19,24 +19,26 @@
 #lang typed/racket/base
 
 (provide
+ (struct-out Filter)
+ (struct-out Range)
+ (struct-out Item)
+ (struct-out ItemUpdate)
+ (struct-out ItemKey)
+ (struct-out ItemVal)
+ (struct-out Key)
+ (struct-out KeyVal)
+ (struct-out KeySchema)
+ (struct-out Exists)
+ (struct-out Throughput)
  Operator operator->string
- Throughput Throughput? Throughput-read Throughput-write
  Action action->string
- Exists Exists? Exists-name Exists-exists
- Key Key? Key-name Key-type
- KeyVal KeyVal? KeyVal-value KeyVal-type
- KeySchema KeySchema? KeySchema-hash-key KeySchema-range-key
- Item Item? Item-name Item-value Item-type
- ItemUpdate ItemUpdate? ItemUpdate-name ItemUpdate-action ItemUpdate-value
- ItemKey ItemKey? ItemKey-hashkey ItemKey-rangekey
- ItemVal ItemVal? ItemVal-value ItemVal-type
  ddbtype-code ddbtype-symbol string->DDBType DDBType DDBType? 
  TableStatus TableStatus? string->TableStatus
  ReturnValues)
 
 (define-type DDBType (U 'String 'Number 'StringSet 'NumberSet))
 
-(define-type Operator (U 'EQ 'LE 'LT 'GE 'GT 'BEGINS_WITH 'BETWEEN 'NULL 'NOT_NULL))
+(define-type Operator (U 'EQ 'LE 'LT 'GE 'GT 'BEGINS_WITH 'BETWEEN 'NULL 'NOT-NULL))
 
 (define-predicate DDBType? DDBType)
 
@@ -98,6 +100,13 @@
 (: action->string (Action -> String))
 (define (action->string action)
   (symbol->string action))
+
+(struct: Filter ([item : String]
+		 [values : (Listof ItemVal)]
+		 [operator : Operator]) #:transparent)
+
+(struct: Range ([values : (Listof ItemVal)]
+		[operator : Operator]) #:transparent)
 
 (struct: Exists ([name : String] [exists : Boolean]) #:transparent)
 
