@@ -39,7 +39,9 @@
  ItemVal
  ItemUpdate
  Throughput Throughput? Throughput-read Throughput-write
- DDBFailure DDBFailure? ConditionalCheckFailed?)
+ DDBFailure DDBFailure? ConditionalCheckFailed?
+ Range Range? Range-values Range-operator
+ query QueryResp QueryResp? QueryResp-lastkey QueryResp-consumed QueryResp-count QueryResp-items)
 
 (require
  (only-in "error.rkt"
@@ -52,7 +54,8 @@
 	  Exists Exists? ReturnValues
 	  ItemKey ItemKey? ItemKey-hashkey ItemKey-rangekey
 	  Item Item? Item-name Item-type Item-value
-	  ItemUpdate ItemVal)
+	  ItemUpdate ItemVal
+	  Range Range? Range-values Range-operator)
  (only-in "createtable.rkt"
 	  create-table CreateTableResp)
  (only-in "deletetable.rkt"
@@ -74,4 +77,9 @@
 	  scan Filter
 	  ScanResp ScanResp? ScanResp-lastkey 
 	  ScanResp-consumed ScanResp-count
-	  ScanResp-scanned ScanResp-items))
+	  ScanResp-scanned ScanResp-items)
+ (only-in "query.rkt"
+	  query QueryResp QueryResp? 
+	  QueryResp-items QueryResp-count
+	  QueryResp-consumed QueryResp-lastkey))
+

@@ -1,5 +1,9 @@
 #lang typed/racket/base
 
+(provide 
+ query
+ (struct-out QueryResp))
+
 (require
  racket/pretty
  (only-in (planet rpr/format:1/json/tjson)
