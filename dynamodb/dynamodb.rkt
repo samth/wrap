@@ -21,7 +21,7 @@
 (provide
  create-table CreateTableResp 
  delete-table describe-table
- get-item GetItemResp GetItemResp-items
+ get-item GetItemResp GetItemResp? GetItemResp-items
  put-item PutItemResp
  update-item UpdateItemResp
  delete-item DeleteItemResult
@@ -65,7 +65,7 @@
  (only-in "listtable.rkt"
 	  list-tables ListTablesResp ListTablesResp?)
  (only-in "getitem.rkt"
-	  get-item GetItemResp GetItemResp-consumed GetItemResp-items)
+	  get-item GetItemResp GetItemResp? GetItemResp-consumed GetItemResp-items)
  (only-in "putitem.rkt"
 	  put-item
 	  PutItemResp PutItemResp?)

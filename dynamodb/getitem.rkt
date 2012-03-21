@@ -19,7 +19,7 @@
 #lang typed/racket/base
 
 (provide 
- get-item GetItemResp GetItemResp-items GetItemResp-consumed)
+ get-item GetItemResp GetItemResp? GetItemResp-items GetItemResp-consumed)
 
 (require
  racket/pretty
