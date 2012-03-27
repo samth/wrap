@@ -26,7 +26,8 @@
  ConditionalCheckFailed ConditionalCheckFailed?
  ValidationException ValidationException?
  ResourceNotFound ResourceNotFound?
- InUseException InUseException?)
+ InUseException InUseException?
+ InvokeConditionsNotMet InvokeConditionsNotMet?)
 
 (require 
  racket/pretty
@@ -34,6 +35,8 @@
  	  Json JsObject JsObject? json->string string->json jsobject))
  	
 (struct: DDBFailure exn:fail () #:transparent)
+
+(struct: InvokeConditionsNotMet DDBFailure () #:transparent)
 
 (struct: IllFormedResponse DDBFailure ([json : String]) #:transparent)
 
@@ -51,7 +54,7 @@
 (define-syntax throw
   (syntax-rules ()
     ((throw excn)
-     (raise (ddb-failure excn #t)))))  ;; FIXME - Should be bug in TR: (raise (ddb-exception excn) #t))))
+     (raise (ddb-failure excn #t)))))
 
 (: is-exception-response? (JsObject -> Boolean))
 (define (is-exception-response? jsobj)
@@ -74,6 +77,11 @@
 	      (ResourceNotFound msg (current-continuation-marks)))
 	     ((string=? type "com.amazonaws.dynamodb.v20111205#ConditionalCheckFailedException")
 	      (ConditionalCheckFailed msg (current-continuation-marks)))			
-	     (else (raise (IllFormedResponse (string-append unknown-msg type) (current-continuation-marks) (json->string jsobj)))))
-	    (raise (IllFormedResponse ill-formed-msg (current-continuation-marks) (json->string jsobj)))))
-      (raise (IllFormedResponse ill-formed-msg (current-continuation-marks) (json->string jsobj)))))
+	     (else (raise (IllFormedResponse (string-append unknown-msg type) 
+					     (current-continuation-marks) (json->string jsobj)))))
+	    (raise (IllFormedResponse ill-formed-msg 
+				      (current-continuation-marks) 
+				      (json->string jsobj)))))
+      (raise (IllFormedResponse ill-formed-msg 
+				(current-continuation-marks) 
+				(json->string jsobj)))))

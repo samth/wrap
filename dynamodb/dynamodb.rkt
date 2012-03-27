@@ -40,11 +40,13 @@
  ItemUpdate
  Throughput Throughput? Throughput-read Throughput-write
  DDBFailure DDBFailure? ConditionalCheckFailed?
+ InvokeConditionsNotMet InvokeConditionsNotMet?
  Range Range? Range-values Range-operator
  query QueryResp QueryResp? QueryResp-lastkey QueryResp-consumed QueryResp-count QueryResp-items)
 
 (require
  (only-in "error.rkt"
+	  InvokeConditionsNotMet InvokeConditionsNotMet?
 	  DDBFailure DDBFailure?
 	  ConditionalCheckFailed?)
  (only-in "types.rkt"
