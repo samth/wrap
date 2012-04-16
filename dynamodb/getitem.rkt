@@ -22,7 +22,6 @@
  get-item GetItemResp GetItemResp? GetItemResp-items GetItemResp-consumed)
 
 (require
- racket/pretty
  (only-in (planet rpr/format:1/json/tjson)
 	  JsObject-empty
  	  Json JsObject JsObject? json->string string->json jsobject

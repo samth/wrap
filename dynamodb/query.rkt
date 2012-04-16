@@ -7,31 +7,33 @@
 (require
  racket/pretty
  (only-in (planet rpr/format:1/json/tjson)
-	  Json JsObject JsObject? jsobject json->string)
+          Json JsObject JsObject? jsobject json->string)
+ (only-in "error.rkt"
+          illformed-response)
  (only-in "types.rkt"
-	  Range Range-values Range-operator
-	  ddbtype-symbol
-	  Operator operator->string 
-	  Item ItemVal ItemVal-type ItemVal-value
-	  ItemKey KeyVal)
+          Range Range-values Range-operator
+          ddbtype-symbol
+          Operator operator->string 
+          Item ItemVal ItemVal-type ItemVal-value
+          ItemKey KeyVal)
  (only-in "action.rkt"
-	  QUERY)
+          QUERY)
  (only-in "invoke.rkt"
-	  dynamodb)
+          dynamodb)
  (only-in "request.rkt"
-	  itemkey-json keyvalue-json)
+          itemkey-json keyvalue-json)
  (only-in "response.rkt"
-	  parse-last-key
-	  parse-positive-integer
-	  parse-consumed-capacity
-	  parse-fail
-	  parse-keyval
-	  parse-items))
+          parse-last-key
+          parse-positive-integer
+          parse-consumed-capacity
+          parse-fail
+          parse-keyval
+          parse-items))
 
 (struct: QueryResp ([lastkey : (Option ItemKey)]
-		    [consumed : Float]
-		    [count : Exact-Nonnegative-Integer]
-		    [items : (Listof (HashTable String Item))]) #:transparent)
+                    [consumed : Float]
+                    [count : Exact-Nonnegative-Integer]
+                    [items : (Listof (HashTable String Item))]) #:transparent)
 
 (: item-val-jsobject (ItemVal -> JsObject))
 (define (item-val-jsobject item-val)
@@ -44,49 +46,43 @@
 (: query-range (Range -> Json))
 (define (query-range range)
   (jsobject `((AttributeValueList . ,(query-range-values (Range-values range)))
-	      (ComparisonOperator . ,(operator->string (Range-operator range))))))
+              (ComparisonOperator . ,(operator->string (Range-operator range))))))
 
 (: query-request (String (Listof String) Exact-Positive-Integer Boolean Boolean
-			 KeyVal (Option Range) Boolean (Option ItemKey) -> String))
+                         KeyVal (Option Range) Boolean (Option ItemKey) -> String))
 (define (query-request table fields limit consistent? count? hash-key range forward? exclusive-start-key)
   (let ((attrs
-	 `((TableName . ,table)
-	   (HashKeyValue . ,(keyvalue-json hash-key))
-	   (ConsistentRead . ,consistent?)
-	   (AttributesToGet . ,fields)
-	   (Limit . ,limit)
-	   (Count . ,count?))))
+         `((TableName . ,table)
+           (HashKeyValue . ,(keyvalue-json hash-key))
+           (ConsistentRead . ,consistent?)
+           (AttributesToGet . ,fields)
+           (Limit . ,limit)
+           (Count . ,count?))))
     (let ((attrs (if exclusive-start-key
-		     (cons `(ExclusiveStartKey . ,(itemkey-json exclusive-start-key)) attrs)
-		     attrs)))
+                     (cons `(ExclusiveStartKey . ,(itemkey-json exclusive-start-key)) attrs)
+                     attrs)))
       (let ((attrs (if range
-		       (cons `(RangeKeyCondition . ,(query-range range)) attrs)
-		       attrs)))
-	(let: ((req : JsObject (jsobject attrs)))
-	  (when (null? fields)
-	    (hash-remove! req 'AttributesToGet))
-	  (json->string req))))))
+                       (cons `(RangeKeyCondition . ,(query-range range)) attrs)
+                       attrs)))
+        (let: ((req : JsObject (jsobject attrs)))
+          (when (null? fields)
+            (hash-remove! req 'AttributesToGet))
+          (json->string req))))))
 
 
 (: query (String (Listof String) Exact-Positive-Integer Boolean Boolean
-		 KeyVal (Option Range) Boolean (Option ItemKey) -> QueryResp))
+                 KeyVal (Option Range) Boolean (Option ItemKey) -> QueryResp))
 (define (query table fields limit consistent? count? hash-key range forward? exclusive-start-key)
   (let ((resp (dynamodb QUERY (query-request table fields limit consistent? count? hash-key range forward? exclusive-start-key))))
     (if (JsObject? resp)
-	(let: ((items-js : Json (hash-ref resp 'Items)))
-	  (if (and (list? items-js)
-		   (andmap JsObject? items-js))
-	      (let ((items (map parse-items items-js)))
-		(let ((last-key (parse-last-key resp))
-		      (consumed (parse-consumed-capacity resp))
-		      (count (parse-positive-integer resp 'Count)))
-		  (QueryResp last-key consumed count items)))
-	      (parse-fail resp)))
-	(error (string-append "Unparsable response from query of " table)))))
+        (let: ((items-js : Json (hash-ref resp 'Items)))
+          (if (and (list? items-js)
+                   (andmap JsObject? items-js))
+              (let ((items (map parse-items items-js)))
+                (let ((last-key (parse-last-key resp))
+                      (consumed (parse-consumed-capacity resp))
+                      (count (parse-positive-integer resp 'Count)))
+                  (QueryResp last-key consumed count items)))
+              (parse-fail resp)))
+        (illformed-response (string-append "Unparsable response from query of " table)))))
 
-(define (test)
-  (query "product" '() 10 #f #f
-	 (KeyVal "ZEB20010" 'String)
-	 (Range (list (ItemVal "sp" 'String)) 'GE)
-	 #f 
-	 #f))

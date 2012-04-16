@@ -23,6 +23,7 @@
 (provide
  throw is-exception-response? ddb-failure
  DDBFailure DDBFailure? 
+ illformed-response
  ConditionalCheckFailed ConditionalCheckFailed?
  ValidationException ValidationException?
  ResourceNotFound ResourceNotFound?
@@ -30,10 +31,9 @@
  InvokeConditionsNotMet InvokeConditionsNotMet?)
 
 (require 
- racket/pretty
  (only-in (planet rpr/format:1/json/tjson)
- 	  Json JsObject JsObject? json->string string->json jsobject))
- 	
+          Json JsObject JsObject? json->string string->json jsobject))
+
 (struct: DDBFailure exn:fail () #:transparent)
 
 (struct: InvokeConditionsNotMet DDBFailure () #:transparent)
@@ -61,27 +61,35 @@
   (and (hash-has-key? jsobj 'message)
        (hash-has-key? jsobj '__type)))
 
-(: ddb-failure (JsObject -> DDBFailure))
+
+(: illformed-response (String -> Nothing))
+(define (illformed-response resp)
+  (raise (IllFormedResponse unknown-msg (current-continuation-marks) resp)))
+
+(: ddb-failure (JsObject -> Nothing))
 (define (ddb-failure jsobj)
+  
+  (: raise-illformed (String -> Nothing))
+  (define (raise-illformed msg)
+    (raise (IllFormedResponse ill-formed-msg 
+                              (current-continuation-marks) 
+                              msg)))
+  
   (if (is-exception-response? jsobj)
       (let ((type (hash-ref jsobj '__type))
-	    (msg  (hash-ref jsobj 'message)))
-	(if (and (string? type)
-		 (string? msg))
-	    (cond
-	     ((string=? type "com.amazon.coral.validate#ValidationException")
-	      (ValidationException msg (current-continuation-marks)))
-	     ((string=? type "com.amazonaws.dynamodb.v20111205#ResourceInUseException")
-	      (InUseException msg (current-continuation-marks)))
-	     ((string=? type "com.amazonaws.dynamodb.v20111205#ResourceNotFoundException")
-	      (ResourceNotFound msg (current-continuation-marks)))
-	     ((string=? type "com.amazonaws.dynamodb.v20111205#ConditionalCheckFailedException")
-	      (ConditionalCheckFailed msg (current-continuation-marks)))			
-	     (else (raise (IllFormedResponse (string-append unknown-msg type) 
-					     (current-continuation-marks) (json->string jsobj)))))
-	    (raise (IllFormedResponse ill-formed-msg 
-				      (current-continuation-marks) 
-				      (json->string jsobj)))))
-      (raise (IllFormedResponse ill-formed-msg 
-				(current-continuation-marks) 
-				(json->string jsobj)))))
+            (msg  (hash-ref jsobj 'message)))
+        (if (and (string? type)
+                 (string? msg))
+            (cond
+              ((string=? type "com.amazon.coral.validate#ValidationException")
+               (raise (ValidationException msg (current-continuation-marks))))
+              ((string=? type "com.amazonaws.dynamodb.v20111205#ResourceInUseException")
+               (raise (InUseException msg (current-continuation-marks))))
+              ((string=? type "com.amazonaws.dynamodb.v20111205#ResourceNotFoundException")
+               (raise (ResourceNotFound msg (current-continuation-marks))))
+              ((string=? type "com.amazonaws.dynamodb.v20111205#ConditionalCheckFailedException")
+               (raise (ConditionalCheckFailed msg (current-continuation-marks))))
+              (else (raise-illformed (json->string jsobj))))
+            (raise-illformed (json->string jsobj))))
+      (raise-illformed (json->string jsobj))))
+

@@ -67,15 +67,15 @@
 (: string->DDBType (String -> (Option DDBType)))
 (define (string->DDBType str)
   (cond
-   ((string=? "S" str)
-    'String)
-   ((string=? "N" str)
-    'Number)
-   ((string=? "SS" str)
-    'StringSet)
-   ((string=? "NS" str)
-    'NumberSet)
-   (else #f)))
+    ((string=? "S" str)
+     'String)
+    ((string=? "N" str)
+     'Number)
+    ((string=? "SS" str)
+     'StringSet)
+    ((string=? "NS" str)
+     'NumberSet)
+    (else #f)))
 
 (define-type TableStatus (U 'Active 'Deleting 'Creating))
 
@@ -84,16 +84,16 @@
 (: string->TableStatus (String -> (Option TableStatus)))
 (define (string->TableStatus str)
   (cond 
-   ((string=? str "ACTIVE") 'Active)
-   ((string=? str "DELETING") 'Deleting)
-   ((string=? str "CREATING") 'Creating)
-   (else #f)))
+    ((string=? str "ACTIVE") 'Active)
+    ((string=? str "DELETING") 'Deleting)
+    ((string=? str "CREATING") 'Creating)
+    (else #f)))
 
 (struct: KeySchema ([hash-key : Key]
-		    [range-key : (Option Key)]) #:transparent)
+                    [range-key : (Option Key)]) #:transparent)
 
 (struct: Throughput ([read : Natural] 
-		     [write : Natural]) #:transparent)
+                     [write : Natural]) #:transparent)
 
 (define-type Action (U 'PUT 'ADD 'DELETE))
 
@@ -102,16 +102,16 @@
   (symbol->string action))
 
 (struct: Filter ([item : String]
-		 [values : (Listof ItemVal)]
-		 [operator : Operator]) #:transparent)
+                 [values : (Listof ItemVal)]
+                 [operator : Operator]) #:transparent)
 
 (struct: Range ([values : (Listof ItemVal)]
-		[operator : Operator]) #:transparent)
+                [operator : Operator]) #:transparent)
 
 (struct: Exists ([name : String] [exists : Boolean]) #:transparent)
 
 (struct: Key ([name : String]
-	      [type : DDBType]) #:transparent)
+              [type : DDBType]) #:transparent)
 
 (struct: KeyVal ([value : String] [type : DDBType]) #:transparent)
 
@@ -120,7 +120,7 @@
 (struct: Item ([name : String] [value : (U (Listof String) String)] [type : DDBType]) #:transparent)
 
 (struct: ItemKey ([hashkey : KeyVal]
-		  [rangekey : (Option KeyVal)]) #:transparent)
+                  [rangekey : (Option KeyVal)]) #:transparent)
 
 (struct: ItemUpdate  ([name : String] [value : (Option ItemVal)] [action : Action]) #:transparent)
 

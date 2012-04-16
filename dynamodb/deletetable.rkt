@@ -42,21 +42,19 @@
 			  [status : TableStatus]
 			  [capacity : Throughput]) #:transparent)
 
-(: delete-table (String -> (U DDBFailure DeleteTableResp)))
+(: delete-table (String -> DeleteTableResp))
 (define (delete-table name)
-  (let ((result (dynamodb DELETE-TABLE (format "{\"TableName\": ~s}" name))))
-    (if (DDBFailure? result)
-	result
-	(parse-delete-table-resp result))))
+  (let ((result (dynamodb DELETE-TABLE (format "{\"TableName\": ~s}" name))))    
+    (parse-delete-table-resp result)))
 
 (: parse-delete-table-resp (Json -> DeleteTableResp))
 (define (parse-delete-table-resp resp)
   (if (JsObject? resp)
       (let ((desc (attr-value resp 'TableDescription JsObject?)))
-	(let ((status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
-			(if status status (invalid-error 'TableStatus resp))))
-	      (name (attr-value desc 'TableName string?))
-	      (capacity (parse-capacity (attr-value desc 'ProvisionedThroughput JsObject?))))
-	  (DeleteTableResp name status capacity)))
-      (invalid-error 'DeleteTable resp)))
+        (let ((status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
+                        (if status status (invalid-error 'TableStatus resp))))
+              (name (attr-value desc 'TableName string?))
+              (capacity (parse-capacity (attr-value desc 'ProvisionedThroughput JsObject?))))
+          (DeleteTableResp name status capacity)))
+      (raise (invalid-error 'DeleteTable resp))))
 	  

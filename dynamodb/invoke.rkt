@@ -21,40 +21,39 @@
 (provide dynamodb)
 
 (require
- racket/pretty
- (only-in racket/port
-	  call-with-input-bytes)
+ (only-in racket/pretty
+          pretty-print)
  (only-in (planet rpr/prelude:1/std/control)
-	  aif)
+          aif)
  (only-in (planet rpr/httpclient:1/uri/url/encode)
-	  url-encode-string)
+          url-encode-string)
  (only-in (planet rpr/httpclient:1/uri)
-	  Uri Uri-query make-uri parse-uri uri->string)
+          Uri Uri-query make-uri parse-uri uri->string)
  (only-in (planet rpr/httpclient:1/http/http11)
-	  HTTPPayload HTTPConnection-in 
-	  http-successful? http-close-connection http-invoke)
+          HTTPPayload HTTPConnection-in 
+          http-successful? http-close-connection http-invoke)
  (only-in (planet rpr/httpclient:1/uri/url/param)
-	  param Param Params encode-param)
+          param Param Params encode-param)
  (only-in (planet rpr/httpclient:1/http/header)
           Header Headers make-header)
  (only-in (planet rpr/prelude:1/type/date)
-	  current-date-string-rfc-2822
-	  current-date-string-iso-8601)
+          current-date-string-rfc-2822
+          current-date-string-iso-8601)
  (only-in (planet rpr/format:1/json/tjson)
-	  Json JsObject JsObject? read-json write-json)
+          Json JsObject JsObject? read-json write-json)
  (only-in "error.rkt"
-	  DDBFailure DDBFailure? ddb-failure
-	  is-exception-response? throw)
+          DDBFailure DDBFailure? ddb-failure
+          is-exception-response? throw)
  (only-in "../sts/session.rkt"
-	  ensure-session)
+          ensure-session)
  (only-in "../auth/authv3.rkt"
-	  auth-signature)
+          auth-signature)
  (only-in "config.rkt"
-	  ddb-host)
+          ddb-host)
  (only-in (planet rpr/aws:1/credential)
-	  SessionCredential SessionCredential?
-	  AwsCredential-session AwsCredential? BaseCredential-secret-key BaseCredential-access-key
-	  SessionCredential-token current-aws-credential))
+          SessionCredential SessionCredential?
+          AwsCredential-session AwsCredential? BaseCredential-secret-key BaseCredential-access-key
+          SessionCredential-token current-aws-credential))
 
 (struct: DynamoDBFailure () #:transparent)
 
@@ -79,24 +78,24 @@
    (date-header)
    (cons "x-amz-target" cmd)))
 
-(: dynamodb-invoke (Uri Headers String -> (U DDBFailure JsObject)))
+(: dynamodb-invoke (Uri Headers String -> JsObject))
 (define (dynamodb-invoke url headers payload)
   (with-handlers ([exn:fail?
-		   (lambda (ex) 
-		     (pretty-print ex)
-		     (raise ex #t))])
+                   (lambda (ex) 
+                     (pretty-print ex)
+                     (raise ex #t))])
     (let ((conn (http-invoke 'POST url headers 
-			     (HTTPPayload "application/x-amz-json-1.0"
-					  #f #f (open-input-string payload)))))
+                             (HTTPPayload "application/x-amz-json-1.0"
+                                          #f #f (open-input-string payload)))))
       ;;(pretty-print headers)
       (let ((json (read-json (HTTPConnection-in conn))))
-	(http-close-connection conn)
-	;;(pretty-print json)
-	(if (JsObject? json)
-	    (if (is-exception-response? json)
-		(ddb-failure json)
-		json)
-	    (error "Invalid DynamoDB response: not a Json Object"))))))
+        (http-close-connection conn)
+        ;;(pretty-print json)
+        (if (JsObject? json)
+            (if (is-exception-response? json)
+                (ddb-failure json)
+                json)
+            (error "Invalid DynamoDB response: not a Json Object"))))))
 
 (: sign-request (Params String -> String))
 (define (sign-request params body)
@@ -105,23 +104,23 @@
 (: authorization-header (Params String SessionCredential -> Param))
 (define (authorization-header headers body session-cred)
   (param "x-amzn-authorization"
-	 (string-append "AWS3 AWSAccessKeyId=" 
-			(BaseCredential-access-key session-cred)
-			",Algorithm=HmacSHA256,"
-			;; "SignedHeaders=host;x-amz-date;x-amz-target;x-amz-security-token,"
-			(sign-request headers body))))
+         (string-append "AWS3 AWSAccessKeyId=" 
+                        (BaseCredential-access-key session-cred)
+                        ",Algorithm=HmacSHA256,"
+                        ;; "SignedHeaders=host;x-amz-date;x-amz-target;x-amz-security-token,"
+                        (sign-request headers body))))
 
-(: dynamodb (String String -> (U DDBFailure Json)))
+(: dynamodb (String String -> Json))
 (define (dynamodb cmd cmd-body)
   ;;(pretty-print cmd-body)
   (if (ensure-session)
       (let* ((scred (let ((scred (AwsCredential-session (current-aws-credential))))
-		      (if scred scred (error "Failure to obtain session credentials"))))
-	     (stok (SessionCredential-token scred)))
-	(let ((url (make-uri "http" #f ddb-host 80 "/" #f #f))
-	      (auth-hdrs (auth-headers cmd stok)))
-	  (let* ((auth (authorization-header auth-hdrs cmd-body scred))
-		 (hdrs (cons auth auth-hdrs))
-		 (shdrs (append hdrs request-headers)))
-	    (dynamodb-invoke url shdrs cmd-body))))
+                      (if scred scred (error "Failure to obtain session credentials"))))
+             (stok (SessionCredential-token scred)))
+        (let ((url (make-uri "http" #f ddb-host 80 "/" #f #f))
+              (auth-hdrs (auth-headers cmd stok)))
+          (let* ((auth (authorization-header auth-hdrs cmd-body scred))
+                 (hdrs (cons auth auth-hdrs))
+                 (shdrs (append hdrs request-headers)))
+            (dynamodb-invoke url shdrs cmd-body))))
       (error "DynamoDB failed to obtain a valid session token")))
