@@ -35,6 +35,7 @@
 	  Header
 	  header->string
 	  make-header
+     make-headers
 	  date-header
 	  content-length
 	  content-type
@@ -125,14 +126,15 @@
 	  (max-keys (s->i (sx-max-keys sxml)))
 	  (is-truncated (s->b (sx-is-truncated sxml)))
 	  (objs (parse-objects sxml)))
+      (pretty-print sxml)
       (Objects name prefix marker (assert max-keys) is-truncated objs)))
 
   (define sx-result (sxpath "s3:ListBucketResult" nss))
-  
-  (let ((query `(("prefix" . ,prefix)
-		 ("marker" . ,marker)
-		 ("delimiter" . ,delimiter)
-		 ("max" . ,(number->string max)))))
+      
+  (let ((query (make-headers `(("prefix" . ,prefix)
+                               ("marker" . ,marker)
+                               ("delimiter" . ,delimiter)
+                               ("max-keys" . ,(number->string max))))))
     (let ((resp (s3-invoke 'GET bucket "" query '() #f)))
       (parse-response (sx-result (S3Response-sxml resp))))))
 

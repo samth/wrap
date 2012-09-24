@@ -50,11 +50,10 @@
     (define sx-resp (sxpath "/s3:ListAllMyBucketsResult" nss))
     (let ((resp (sx-resp sxml)))
       (if resp
-	  (begin
-	    (let ((owner (parse-owner resp))
-		  (buckets (parse-buckets resp)))
-	      (Buckets owner buckets)))
-	  (error "S3 call failed"))))
+          (let ((owner (parse-owner resp))
+                (buckets (parse-buckets resp)))
+            (Buckets owner buckets))
+          (error "S3 call failed"))))
 
   (let ((resp (s3-invoke 'GET #f "/" #f '() #f)))
     (parse-response (S3Response-sxml resp))))
