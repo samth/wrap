@@ -121,13 +121,15 @@
                                                                                 (exn-message ex)))
                                                      empty-response)))]
               
-              (if (http-has-content? connection)
-                  (let ((results (xml->sxml (HTTPConnection-in connection) '())))
+              (if (and (http-has-content? connection) (not (eq? action 'HEAD)))
+                  (let ((results (xml->sxml (HTTPConnection-in connection) '())))                    
                     (http-close-connection connection)
                     (S3Response (ResponseHeader-status (HTTPConnection-header connection))
                                 results))
-                  (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-                              empty-response)))))
+                  (begin0                                        
+                    (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+                                empty-response)
+                    (http-close-connection connection))))))
         (S3Response (StatusLine 'HTTP/1.1 400 
                                 (string-append "Bad Request - Malformed URL"))
                     empty-response))))
