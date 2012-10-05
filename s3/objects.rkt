@@ -24,7 +24,6 @@
  put-file-object)
 
 (require 
- racket/pretty
  (only-in (planet rpr/prelude:1/type/date)
 	  current-date-string-rfc-2822)
  (only-in (planet rpr/httpclient:1/uri)
@@ -57,7 +56,7 @@
  (only-in "../configuration.rkt"
 	  s3-host)
  (only-in "types.rkt" 
-	  Owner Bucket Buckets Objects Object)
+	  Prefix Owner Bucket Buckets Keys Key)
  (only-in "configuration.rkt"
 	  nss)
  (only-in "invoke.rkt"
@@ -67,7 +66,7 @@
 
 ;; FIXME Use opt-map to create the parameter query string
 
-(: list-bucket-objects (String String String String Integer -> Objects))
+(: list-bucket-objects (String String String String Integer -> Keys))
 (define (list-bucket-objects bucket prefix delimiter marker max)
 
   (: s->i (String -> (Option Integer)))
@@ -89,7 +88,7 @@
 	  (name (sx-name sxml)))
       (Owner id name)))
 
-  (: parse-object (Sxml -> Object))
+  (: parse-object (Sxml -> Key))
   (define (parse-object sxml)
     (define sx-key (select-single-node-text "/s3:Key" nss))
     (define sx-last-modified (select-single-node-text "/s3:LastModified" nss))
@@ -102,18 +101,27 @@
 	  (size (s->i (sx-size sxml)))
 	  ;;(storage (sx-storage sxml))
 	  (owner (parse-owner sxml)))
-      (Object key last-modified ;; storage 
+      (Key key last-modified ;; storage 
 	      etag (assert size) owner)))
   
-  (: parse-objects (Sxml -> (Listof Object)))
+  (: parse-objects (Sxml -> (Listof Key)))
   (define (parse-objects sxml)
     (define sx-objects (sxpath "/s3:Contents" nss))
     (let ((objs (sx-objects sxml)))
       (if (andmap list? objs)
 	  (map parse-object objs)
 	  '())))
-
-  (: parse-response (Sxml -> Objects))
+  
+  (: parse-prefixes (Sxml -> (Listof Prefix)))
+  (define (parse-prefixes sxml)
+    (define sx-prefixes (sxpath "/s3:CommonPrefixes" nss))
+    (define sx-prefix    (select-single-node-text "/s3:Prefix" nss))
+    (let ((pre-s (sx-prefixes sxml)))
+      (if (andmap list? pre-s)
+          (map (λ: ((sxml : Sxml)) (Prefix (sx-prefix sxml))) pre-s)
+          '())))
+      
+  (: parse-response (Sxml -> Keys))
   (define (parse-response sxml)
     (define sx-name (select-single-node-text "/s3:Name" nss))
     (define sx-prefix (select-single-node-text "/s3:Prefix" nss))
@@ -121,13 +129,13 @@
     (define sx-max-keys (select-single-node-text "/s3:MaxKeys" nss))
     (define sx-is-truncated (select-single-node-text "/s3:IsTruncated" nss))
     (let ((name (sx-name sxml))
-	  (prefix (sx-prefix sxml))
-	  (marker (sx-marker sxml))
-	  (max-keys (s->i (sx-max-keys sxml)))
-	  (is-truncated (s->b (sx-is-truncated sxml)))
-	  (objs (parse-objects sxml)))
-      (pretty-print sxml)
-      (Objects name prefix marker (assert max-keys) is-truncated objs)))
+          (prefix (sx-prefix sxml))
+          (marker (sx-marker sxml))
+          (max-keys (s->i (sx-max-keys sxml)))
+          (is-truncated (s->b (sx-is-truncated sxml)))
+          (objs (parse-objects sxml))
+          (prefixes (parse-prefixes sxml)))
+      (Keys name prefix marker (assert max-keys) is-truncated prefixes objs)))
 
   (define sx-result (sxpath "s3:ListBucketResult" nss))
       

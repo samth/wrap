@@ -8,7 +8,6 @@
  s3-invoke)
 
 (require
- racket/pretty
  (only-in (planet rpr/httpclient:1/uri)
           make-uri Uri Uri-path)
  (only-in (planet rpr/prelude:1/type/date)
@@ -108,7 +107,7 @@
                                                                         md5 mime
                                                                         datetime '()
                                                                         canonical-resource)))))
-          (pretty-print url)
+          ;;(pretty-print url)
           (let ((connection (http-invoke action 
                                          url 
                                          (append core-headers headers)

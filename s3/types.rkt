@@ -18,13 +18,13 @@
 
 #lang typed/racket/base
 
-(provide Buckets Buckets? Buckets-owner Buckets-buckets
-	 Owner Owner? Owner-id Owner-name
-	 Bucket Bucket? Bucket-name Bucket-creation-date
-	 Object Object? Object-key Object-last-modified
-	 Object-etag Object-size Object-owner ;; Object-storage-class
-	 Objects Objects? Objects-name Objects-prefix Objects-marker
-	 Objects-max-keys Objects-is-truncated Objects-objects)
+(provide 
+ (struct-out Buckets)
+ (struct-out Owner)
+ (struct-out Bucket)
+ (struct-out Key)
+ (struct-out Keys)
+ (struct-out Prefix))
 
 (struct: Buckets
 	 ([owner : Owner]
@@ -38,7 +38,7 @@
 	 ([name : String]
 	  [creation-date : String]) #:transparent)
 
-(struct: Object
+(struct: Key
 	 ([key : String]
 	  [last-modified : String]
 	  ;; [storage-class : String]
@@ -46,10 +46,13 @@
 	  [size : Integer]
 	  [owner : Owner]) #:transparent)
 
-(struct: Objects
-	 ([name : String]
-	  [prefix : String]
-	  [marker : String]
-	  [max-keys : Integer]
-	  [is-truncated : Boolean]
-	  [objects : (Listof Object)]) #:transparent)
+(struct: Prefix ([prefix : String]) #:transparent)
+
+(struct: Keys
+  ([name : String]
+   [prefix : String]
+   [marker : String]
+   [max-keys : Integer]
+   [is-truncated : Boolean]
+   [prefixes : (Listof Prefix)]
+   [objects : (Listof Key)]) #:transparent)
