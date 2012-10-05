@@ -8,6 +8,7 @@
  s3-invoke)
 
 (require
+ (only-in racket/port port->bytes)
  (only-in (planet rpr/httpclient:1/uri)
           make-uri Uri Uri-path)
  (only-in (planet rpr/prelude:1/type/date)
@@ -85,6 +86,78 @@
                                (aws-auth-mac (BaseCredential-secret-key credential)
                                              auth-str))))
 
+(: s3-get-object-pipe-to-file (String String Path -> S3Response))
+(define (s3-get-object-pipe-to-file bucket path file-path)
+  (define: buff-sz : Integer (* 10 1024))
+  (define: zero : Integer 0)
+  (let ((url (make-base-uri bucket path '())))
+    (if url 
+        (let* ((datetime (current-date-string-rfc-2822))
+               (canonical-resource (string-append "/" bucket (Uri-path url)))
+               (core-headers  (list (make-header DATE datetime)
+                                    (authorization-header (current-aws-credential)
+                                                          (aws-auth-str (http-method->string 'GET)
+                                                                        "" ""
+                                                                        datetime '()
+                                                                        canonical-resource)))))
+          (let ((connection (http-invoke 'GET url core-headers #f)))
+            (with-handlers [(exn:fail? (λ (ex)
+                                         ((error-display-handler) "ERROR in S3 Object GET" ex)
+                                         (http-close-connection connection)
+                                         (S3Response (StatusLine 'HTTP/1.1 500
+                                                                 (exn-message ex))
+                                                     empty-response)))]
+              (if (http-has-content? connection)
+                  (call-with-output-file
+                      file-path 
+                    (λ: ((outp : Output-Port))
+                      (let* ((inp (HTTPConnection-in connection))                            
+                             (buffer (make-bytes buff-sz)))
+                        (let: loop : S3Response ((bs : (U EOF Integer) (read-bytes! buffer inp)))
+                          (if (eof-object? bs)
+                              (begin
+                                (http-close-connection connection)
+                                (S3Response (StatusLine 'HTTP/1.1 200 "OK") empty-response))
+                              (begin
+                                (write-bytes buffer outp zero bs)
+                                (loop (read-bytes! buffer inp)))))))
+                    #:mode 'binary
+                    #:exists 'error)
+                  (S3Response (StatusLine 'HTTP/1.1 500
+                                          "S3 GET of object returned no content")
+                              empty-response)))))
+        (S3Response (StatusLine 'HTTP/1.1 400 
+                                (string-append "Bad Request - Malformed URL"))
+                    empty-response))))
+
+(: s3-get-object (String String -> (U S3Response Bytes)))
+(define (s3-get-object bucket path)
+  (let ((url (make-base-uri bucket path '())))
+    (if url 
+        (let* ((datetime (current-date-string-rfc-2822))
+               (canonical-resource (string-append "/" bucket (Uri-path url)))
+               (core-headers  (list (make-header DATE datetime)
+                                    (authorization-header (current-aws-credential)
+                                                          (aws-auth-str (http-method->string 'GET)
+                                                                        "" ""
+                                                                        datetime '()
+                                                                        canonical-resource)))))
+          (let ((connection (http-invoke 'GET url core-headers #f)))
+            (with-handlers [(exn:fail? (λ (ex)
+                                         ((error-display-handler) "ERROR in S3 Object GET" ex)
+                                         (http-close-connection connection)
+                                         (S3Response (StatusLine 'HTTP/1.1 500
+                                                                 (exn-message ex))
+                                                     empty-response)))]
+              (if (http-has-content? connection)
+                  (let ((bytes (port->bytes (HTTPConnection-in connection))))
+                    (http-close-connection connection)
+                    bytes)
+                  (bytes)))))
+        (S3Response (StatusLine 'HTTP/1.1 400 
+                                (string-append "Bad Request - Malformed URL"))
+                    empty-response))))
+                                                                        
 (: s3-invoke (Method (Option String) String (Option Params) Headers (Option HTTPPayload) -> S3Response))
 (define (s3-invoke action bucket path query-params headers payload)
   (let ((url (make-base-uri bucket path query-params)))
@@ -92,8 +165,7 @@
         (let* ((datetime (current-date-string-rfc-2822))
                (canonical-resource (if bucket
                                        (string-append "/" bucket (Uri-path url))
-                                       (Uri-path url)))
-               
+                                       (Uri-path url)))               
                (md5 (if payload 
                         (let ((md5 (HTTPPayload-md5 payload)))
                           (if md5 md5 ""))
@@ -122,7 +194,7 @@
                                                      empty-response)))]
               
               (if (and (http-has-content? connection) (not (eq? action 'HEAD)))
-                  (let ((results (xml->sxml (HTTPConnection-in connection) '())))                    
+                  (let ((results (xml->sxml (HTTPConnection-in connection) '())))
                     (http-close-connection connection)
                     (S3Response (ResponseHeader-status (HTTPConnection-header connection))
                                 results))

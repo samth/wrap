@@ -164,11 +164,37 @@
 (: put-object (Bytes String String -> S3Response))
 (define (put-object bytes bucket path)
   (let* ((length (bytes-length bytes))
-	 (md5 (base64-encode (md5-bytes bytes)))
-	 (mime "binary/octet-stream")
-	 (payload (HTTPPayload mime md5 length (open-input-bytes bytes))))
+         (md5 (base64-encode (md5-bytes bytes)))
+         (mime "binary/octet-stream")
+         (payload (HTTPPayload mime md5 length (open-input-bytes bytes))))
     (s3-invoke 'PUT bucket path #f '() payload)))
 
 (: delete-object (String String -> S3Response))
 (define (delete-object bucket path)
   (s3-invoke 'DELETE bucket path #f '() #f))
+
+(: head-object (String String -> S3Response))
+(define (head-object bucket path)
+  (s3-invoke 'HEAD bucket path #f '() #f))
+
+(: get-object (String String -> S3Response))
+(define (get-object bucket path)
+  (s3-invoke 'GET bucket path #f '() #f))
+
+;; (define (get-object credentials s3-resource)
+;;   (let* ((datetime (rfc2822-date))
+;;        (http-headers (list (date-header datetime)
+;; 			   (authorization-header credentials 
+;; 						 (aws-s3-auth-str "GET" "" "" datetime '() 
+;; 								  (s3-resource->string s3-resource))))))
+;;     (s3-response-from-port (s3-get (make-object-url s3-resource) http-headers))))
+
+;(define (head-object credentials s3-resource)
+;  (let* ((datetime (rfc2822-date))           
+;         (http-headers (list (date-header datetime)
+;                             (authorization-header credentials 
+;                                                   (aws-s3-auth-str "HEAD" "" "" datetime '() 
+;                                                                    (s3-resource->string s3-resource))))))
+;    (s3-response-from-port (s3-head (make-object-url s3-resource) http-headers))))
+
+
