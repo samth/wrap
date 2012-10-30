@@ -18,7 +18,7 @@ This library provides integration to various Amazon AWS cloud services.
 
 @subsection{Configuration}
 
-@defmodule[(planet rpr/aws/sqs/config)]{
+@defmodule["../aws/sqs/config.rkt"]{
 
 Currently SQS configuration is hardcoded in a "config.rkt" file and reviewed and modified to suit.
 
@@ -98,7 +98,7 @@ Utility procedure to set the @racket{current-aws-credential} parameter.  Not req
 
 
 @subsection{STS}
-@defmodule[(planet rpr/aws/sts/stc)]
+@defmodule["../aws/sts/stc.rkt"]
 
 @defproc[(get-session-token [duration-secs Exact-Nonnegative-Integer]) SessionCredential]{
 Obtains a session token valid for the given duration in seconds from the AWS STS service.
@@ -205,7 +205,7 @@ Sends a message to the given gueue. The queue-path should be absolute, e.g. "/my
 
 @defthing[AttributeName (U 'All 'SenderId 'SentTimestamp 
                            'ApproximateReceiveCount 
-			   'ApproximateFirstReceiveTimestamp)]{
+			        'ApproximateFirstReceiveTimestamp)]{
 A define-type of an enumeration of allowable code values which specify the attribute values to be returned by SQS when receiving a message.			
 }
 

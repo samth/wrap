@@ -24,7 +24,7 @@
 
 (require 
  racket/pretty
- (only-in (planet rpr/format:1/json/tjson)
+ (only-in "../../format/json/tjson.rkt"
           Json JsObject JsObject? json->string 
           jsobject jsobject-add-attribute)
  (only-in "action.rkt"

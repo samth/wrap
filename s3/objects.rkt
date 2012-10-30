@@ -24,45 +24,45 @@
  put-file-object)
 
 (require 
- (only-in (planet rpr/prelude:1/type/date)
-	  current-date-string-rfc-2822)
- (only-in (planet rpr/httpclient:1/uri)
-	  make-uri Uri Uri-path uri->string)
- (only-in (planet rpr/httpclient:1/http/heading)
-	  DATE HOST)
- (only-in (planet rpr/httpclient:1/http/header)
-	  Header
-	  header->string
-	  make-header
-     make-headers
-	  date-header
-	  content-length
-	  content-type
-	  content-md5)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  ResponseHeader HTTPPayload
-	  HTTPConnection-in HTTPConnection-header
-	  http-invoke http-close-connection make-client-error-response)
- (only-in (planet rpr/httpclient:1/uri/url/param)
-	  Params
-	  params->query)
- (only-in (planet rpr/crypto:1/base64)
-	  base64-encode)
- (only-in (planet rpr/crypto:1/hash/md5)
-	  md5-bytes)
- (only-in (planet rpr/format:1/xml/sxml)
-	  Sxml SXPath 
-	  sxpath xml->sxml select-single-node-text)
+ (only-in "../../prelude/type/date.rkt"
+          current-date-string-rfc-2822)
+ (only-in "../../httpclient/uri.rkt"
+          make-uri Uri Uri-path uri->string)
+ (only-in "../../httpclient/http/heading.rkt"
+          DATE HOST)
+ (only-in "../../httpclient/http/header.rkt"
+          Header
+          header->string
+          make-header
+          make-headers
+          date-header
+          content-length
+          content-type
+          content-md5)
+ (only-in "../../httpclient/http/http11.rkt"
+          ResponseHeader HTTPPayload
+          HTTPConnection-in HTTPConnection-header
+          http-invoke http-close-connection make-client-error-response)
+ (only-in "../../httpclient/uri/url/param.rkt"
+          Params
+          params->query)
+ (only-in "../../crypto/base64.rkt"
+          base64-encode)
+ (only-in "../../crypto/hash/md5.rkt"
+          md5-bytes)
+ (only-in "../../format/xml/sxml.rkt"
+          Sxml SXPath 
+          sxpath xml->sxml select-single-node-text)
  (only-in "../configuration.rkt"
-	  s3-host)
+          s3-host)
  (only-in "types.rkt" 
-	  Prefix Owner Bucket Buckets Keys Key)
+          Prefix Owner Bucket Buckets Keys Key)
  (only-in "configuration.rkt"
-	  nss)
+          nss)
  (only-in "invoke.rkt"
-	  make-base-uri make-empty-error-response s3-invoke
-	  S3Response S3Response-sxml
-	  S3Payload))
+          make-base-uri make-empty-error-response s3-invoke
+          S3Response S3Response-sxml
+          S3Payload))
 
 ;; FIXME Use opt-map to create the parameter query string
 

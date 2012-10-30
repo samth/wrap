@@ -9,13 +9,13 @@
 
 (require
  (only-in racket/port port->bytes)
- (only-in (planet rpr/httpclient:1/uri)
+ (only-in "../../httpclient/uri.rkt"
           make-uri Uri Uri-path)
- (only-in (planet rpr/prelude:1/type/date)
+ (only-in "../../prelude/type/date.rkt"
           current-date-string-rfc-2822)
- (only-in (planet rpr/httpclient:1/http/heading)
+ (only-in "../../httpclient/http/heading.rkt"
           DATE HOST)
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../httpclient/http/header.rkt"
           Header Headers
           header->string
           make-header
@@ -23,16 +23,16 @@
           content-length
           content-type
           content-md5)
- (only-in (planet rpr/httpclient:1/uri/url/param)
+ (only-in "../../httpclient/uri/url/param.rkt"
           Params
           params->query)
- (only-in (planet rpr/httpclient:1/http/http11)
+ (only-in "../../httpclient/http/http11.rkt"
           Method HTTPPayload HTTPPayload-md5 HTTPPayload-mime
           http-method->string http-status-code http-has-content?
           ResponseHeader-status StatusLine
           HTTPConnection-in HTTPConnection-header
           http-invoke http-close-connection make-client-error-response)
- (only-in (planet rpr/format:1/xml/sxml)
+ (only-in "../../format/xml/sxml.rkt"
           Sxml SXPath 
           sxpath xml->sxml select-single-node-text)
  (only-in "../credential.rkt"
@@ -157,7 +157,7 @@
         (S3Response (StatusLine 'HTTP/1.1 400 
                                 (string-append "Bad Request - Malformed URL"))
                     empty-response))))
-                                                                        
+
 (: s3-invoke (Method (Option String) String (Option Params) Headers (Option HTTPPayload) -> S3Response))
 (define (s3-invoke action bucket path query-params headers payload)
   (let ((url (make-base-uri bucket path query-params)))

@@ -4,23 +4,22 @@
 	 browse-node-search)
 
 (require
- racket/pretty
- (only-in (planet rpr/httpclient:1/uri/url/encode)
-	  url-encode-string)
- (only-in (planet rpr/httpclient:1/uri)
-	  make-uri)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  http-invoke)
- (only-in (planet rpr/httpclient:1/http/header)
-	  Header
-	  Headers)
+ (only-in "../../httpclient/uri/url/encode.rkt"
+          url-encode-string)
+ (only-in "../../httpclient/uri.rkt"
+          make-uri)
+ (only-in "../../httpclient/http/http11.rkt"
+          http-invoke)
+ (only-in "../../httpclient/http/header.rkt"
+          Header
+          Headers)
  (only-in "../credential.rkt"
-	  AwsCredential-associate-tag
-	  BaseCredential-secret-key
-	  BaseCredential-access-key)
+          AwsCredential-associate-tag
+          BaseCredential-secret-key
+          BaseCredential-access-key)
  (only-in "../configuration.rkt"
-	  a2s-ns
-	  a2s-host)
+          a2s-ns
+          a2s-host)
  "a2s.rkt")
 
 (: search-op-parm Header)
@@ -45,11 +44,11 @@
     ((Attributes)  "ItemAttributes")
     ((Nodes)       "BrowseNodes")
     ((Offer)       "OfferSummary")
-    ((Rank)	   "SalesRank")
-    ((Small)	   "Small")
+    ((Rank)	"SalesRank")
+    ((Small)	"Small")
     ((Large)       "Large")
-    ((Review)	   "EditorialReview")
-    ((Ids)	   "ItemIds")
+    ((Review)	"EditorialReview")
+    ((Ids)	        "ItemIds")
     (else          "Small")))  
 
 ;;      ((Images)		"Images")

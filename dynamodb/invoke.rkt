@@ -23,23 +23,23 @@
 (require
  (only-in racket/pretty
           pretty-print)
- (only-in (planet rpr/prelude:1/std/control)
+ (only-in "../../prelude/std/control.rkt"
           aif)
- (only-in (planet rpr/httpclient:1/uri/url/encode)
+ (only-in "../../httpclient/uri/url/encode.rkt"
           url-encode-string)
- (only-in (planet rpr/httpclient:1/uri)
+ (only-in "../../httpclient/uri.rkt"
           Uri Uri-query make-uri parse-uri uri->string)
- (only-in (planet rpr/httpclient:1/http/http11)
+ (only-in "../../httpclient/http/http11.rkt"
           HTTPPayload HTTPConnection-in 
           http-successful? http-close-connection http-invoke)
- (only-in (planet rpr/httpclient:1/uri/url/param)
+ (only-in "../../httpclient/uri/url/param.rkt"
           param Param Params encode-param)
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../httpclient/http/header.rkt"
           Header Headers make-header)
- (only-in (planet rpr/prelude:1/type/date)
+ (only-in "../../prelude/type/date.rkt"
           current-date-string-rfc-2822
           current-date-string-iso-8601)
- (only-in (planet rpr/format:1/json/tjson)
+ (only-in "../../format/json/tjson.rkt"
           Json JsObject JsObject? read-json write-json)
  (only-in "error.rkt"
           DDBFailure DDBFailure? ddb-failure
@@ -50,7 +50,7 @@
           auth-signature)
  (only-in "config.rkt"
           ddb-host)
- (only-in (planet rpr/aws:1/credential)
+ (only-in "../credential.rkt"
           SessionCredential SessionCredential?
           AwsCredential-session AwsCredential? BaseCredential-secret-key BaseCredential-access-key
           SessionCredential-token current-aws-credential))

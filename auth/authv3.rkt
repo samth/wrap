@@ -5,20 +5,20 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/prelude:1/text/util)
-	  weave-string-separator)
- (only-in (planet rpr/httpclient:1/http/header)
-	  header->string)
- (only-in (planet rpr/httpclient:1/uri/url/encode)
-	  url-encode-string)
- (only-in (planet rpr/crypto:1/hash/sha256)
-	  sha256)
- (only-in (planet rpr/crypto:1/base64)
-	  base64-encode)
- (only-in (planet rpr/crypto:1/hmac)
-	  hmac-sha256)
- (only-in (planet rpr/httpclient:1/uri/url/param)
-	  param Param Params)
+ (only-in "../../prelude/text/util.rkt"
+          weave-string-separator)
+ (only-in "../../httpclient/http/header.rkt"
+          header->string)
+ (only-in "../../httpclient/uri/url/encode.rkt"
+          url-encode-string)
+ (only-in "../../crypto/hash/sha256.rkt"
+          sha256)
+ (only-in "../../crypto/base64.rkt"
+          base64-encode)
+ (only-in "../../crypto/hmac.rkt"
+          hmac-sha256)
+ (only-in "../../httpclient/uri/url/param.rkt"
+          param Param Params)
  (only-in "../credential.rkt"
 	  AwsCredential-session BaseCredential-secret-key 
 	  current-aws-credential))

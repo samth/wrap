@@ -5,16 +5,16 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/format:1/json/tjson)
-	  Json JsObject jsobject json->string)
+ (only-in "../../format/json/tjson.rkt"
+          Json JsObject jsobject json->string)
  (only-in "types.rkt" KeyVal
-	  ItemKey Exists Item ReturnValues)
+          ItemKey Exists Item ReturnValues)
  (only-in "action.rkt"
-	  DELETE-ITEM)
+          DELETE-ITEM)
  (only-in "invoke.rkt"
-	  dynamodb)
+          dynamodb)
  (only-in "request.rkt"
-	  return-values-json itemkey-json))
+          return-values-json itemkey-json))
 
 (struct: DeleteItemResult () #:transparent)
 

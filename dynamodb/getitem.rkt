@@ -22,29 +22,29 @@
  get-item GetItemResp GetItemResp? GetItemResp-items GetItemResp-consumed)
 
 (require
- (only-in (planet rpr/format:1/json/tjson)
-	  JsObject-empty
- 	  Json JsObject JsObject? json->string string->json jsobject
-	  jsobject-add-attribute jsobject-remove-attribute)
- (only-in (planet rpr/prelude:1/std/opt)
-	  opt-orelse)
+ (only-in "../../format/json/tjson.rkt"
+          JsObject-empty
+          Json JsObject JsObject? json->string string->json jsobject
+          jsobject-add-attribute jsobject-remove-attribute)
+ (only-in "../../prelude/std/opt.rkt"
+          opt-orelse)
  (only-in "types.rkt"
-	  ddbtype-symbol DDBType
-	  Item
-	  Key Key? Key-name Key-type
-	  KeyVal KeyVal? KeyVal-value KeyVal-type
-	  ItemKey)
+          ddbtype-symbol DDBType
+          Item
+          Key Key? Key-name Key-type
+          KeyVal KeyVal? KeyVal-value KeyVal-type
+          ItemKey)
  (only-in "action.rkt"
-	  GET-ITEM)
+          GET-ITEM)
  (only-in "invoke.rkt"
-	  dynamodb)
+          dynamodb)
  (only-in "request.rkt"
-	  itemkey-json)
+          itemkey-json)
  (only-in "response.rkt"
-	  parse-consumed-capacity
-	  parse-fail
-	  parse-items))
- 
+          parse-consumed-capacity
+          parse-fail
+          parse-items))
+
 (struct: GetItemResp ([items : (HashTable String Item)] [consumed : Float]) #:transparent)
 
 (: get-item-request (String ItemKey (Listof String) Boolean -> String))

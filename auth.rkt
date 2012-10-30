@@ -28,15 +28,15 @@
 (require
  (only-in racket/pretty
           pretty-print)
- (only-in (planet rpr/prelude:1/text/util)
+ (only-in "../prelude/text/util.rkt"
           weave-string-separator)
- (only-in (planet rpr/crypto:1/base64)
+ (only-in "../crypto/base64.rkt"
           base64-encode)
- (only-in (planet rpr/crypto:1/hmac)
+ (only-in "../crypto/hmac.rkt"
           hmac-sha1 hmac-sha256)
- (only-in (planet rpr/httpclient:1/uri/url/encode)
+ (only-in "../httpclient/uri/url/encode.rkt"
           url-encode-string)
- (only-in (planet rpr/httpclient:1/uri/url/param)
+ (only-in "../httpclient/uri/url/param.rkt"
           params->query Param Params))
 
 (: ddb-base String)

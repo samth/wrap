@@ -13,12 +13,12 @@ Common routines for parsing DynamoDB responses.
 (require
  racket/pretty
  (only-in "types.rkt"
-	  ddbtype-symbol DDBType
-	  Item ItemVal ItemKey KeyVal)
- (only-in (planet rpr/format:1/json/tjson)
-	  JsObject-empty
- 	  Json JsObject JsObject? json->string string->json 
-	  jsobject jsobject-add-attribute))
+          ddbtype-symbol DDBType
+          Item ItemVal ItemKey KeyVal)
+ (only-in "../../format/json/tjson.rkt"
+          JsObject-empty
+          Json JsObject JsObject? json->string string->json 
+          jsobject jsobject-add-attribute))
 
 (: parse-fail (Json -> Nothing))
 (define (parse-fail json)

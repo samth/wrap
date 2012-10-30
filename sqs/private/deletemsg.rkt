@@ -4,12 +4,12 @@
  delete-message)
 
 (require 
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../../httpclient/http/header.rkt"
           Headers make-header)
- (only-in (planet rpr/httpclient:1/uri/url/encode)
-	  url-encode-string)
+ (only-in "../../../httpclient/uri/url/encode.rkt"
+          url-encode-string)
  (only-in "invoke.rkt"
-	  SQSError sqs-invoke))
+          SQSError sqs-invoke))
 
 (: delete-message-request (String -> Headers))
 (define (delete-message-request msg)

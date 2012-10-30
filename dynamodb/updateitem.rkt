@@ -5,7 +5,7 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/format:1/json/tjson)
+ (only-in "../../format/json/tjson.rkt"
           Json JsObject jsobject json->string)
  (only-in "action.rkt"
           UPDATE-ITEM)

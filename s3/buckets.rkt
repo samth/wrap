@@ -4,7 +4,7 @@
  list-buckets)
 
 (require
- (only-in (planet rpr/format:1/xml/sxml)
+ (only-in "../../format/xml/sxml.rkt"
           Sxml SXPath 
           sxpath xml->sxml select-single-node-text)
  (only-in "types.rkt" 

@@ -31,7 +31,7 @@
  InvokeConditionsNotMet InvokeConditionsNotMet?)
 
 (require 
- (only-in (planet rpr/format:1/json/tjson)
+ (only-in "../../format/json/tjson.rkt"
           Json JsObject JsObject? json->string string->json jsobject))
 
 (struct: DDBFailure exn:fail () #:transparent)

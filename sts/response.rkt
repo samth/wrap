@@ -4,15 +4,14 @@
  parse-session-response)
 
 (require
- racket/pretty 
- (only-in (planet rpr/prelude:1/type/date)
-	  date->time-utc iso-8601-date-string->date)
- (only-in (planet rpr/format:1/xml/sxml)
-	  Sxml SXPath sxpath extract-text extract-integer)
+ (only-in "../../prelude/type/date.rkt"
+          date->time-utc iso-8601-date-string->date)
+ (only-in "../../format/xml/sxml.rkt"
+          Sxml SXPath sxpath extract-text extract-integer)
  (only-in "../credential.rkt"
-	  SessionCredential current-aws-credential)
+          SessionCredential current-aws-credential)
  (only-in "config.rkt"
-	  sts-ns))
+          sts-ns))
 
 (: mk-sxpath (String -> SXPath))
 (define mk-sxpath

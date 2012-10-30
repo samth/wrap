@@ -5,12 +5,12 @@
  parse-capacity parse-key-schema)
 
 (require  
- (only-in (planet rpr/format:1/json/tjson)
-	  Json JsObject JsObject? json->string 
-	  jsobject)
+ (only-in "../../format/json/tjson.rkt"
+          Json JsObject JsObject? json->string 
+          jsobject)
  (only-in "types.rkt"
-	  string->DDBType
-	  Key KeySchema Throughput))
+          string->DDBType
+          Key KeySchema Throughput))
 
 (define-syntax attr-of-type
   (syntax-rules ()

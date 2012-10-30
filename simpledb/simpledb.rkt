@@ -5,24 +5,24 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/prelude:1/std/control)
+ (only-in "../../prelude/std/control.rkt"
 	  aif)
- (only-in (planet rpr/httpclient:1/uri/url/param)
-	  params->query parse-params param Param Params)
- (only-in (planet rpr/httpclient:1/uri)
-	  Uri Uri-query make-uri parse-uri uri->string)
- (only-in (planet rpr/httpclient:1/uri/url/encode)
-	  url-encode-string)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../httpclient/uri/url/param.rkt"
+          params->query parse-params param Param Params)
+ (only-in "../../httpclient/uri.rkt"
+          Uri Uri-query make-uri parse-uri uri->string)
+ (only-in "../../httpclient/uri/url/encode.rkt"
+          url-encode-string)
+ (only-in "../../httpclient/http/http11.rkt"
+          HTTPConnection-in http-successful? http-close-connection http-invoke)
+ (only-in "../../httpclient/http/header.rkt"
           Headers make-header)
- (only-in (planet rpr/format:1/xml/sxml)
-	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
+ (only-in "../../format/xml/sxml.rkt"
+          Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
  (only-in "../credential.rkt"
-	  BaseCredential-secret-key BaseCredential-access-key current-aws-credential)
+          BaseCredential-secret-key BaseCredential-access-key current-aws-credential)
  (only-in "../auth/authv2.rkt"
-	  authv2-signature)
+          authv2-signature)
  (only-in "config.rkt"
 	  sdb-host sdb-ns sdb-api-version))
 

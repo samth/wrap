@@ -11,16 +11,16 @@
  itemkey-json)
 
 (require
- (only-in (planet rpr/format:1/json/tjson)
- 	  Json JsObject JsObject? json->string string->json 
-	  jsobject jsobject-add-attribute)
+ (only-in  "../../format/json/tjson.rkt"
+           Json JsObject JsObject? json->string string->json 
+           jsobject jsobject-add-attribute)
  (only-in "types.rkt"
-	  Exists Exists? Exists-name Exists-exists
-	  Item Item? Item-name Item-type Item-value
-	  ddbtype-symbol
-	  ReturnValues
-	  KeyVal KeyVal-type KeyVal-value
-	  ItemKey ItemKey-hashkey ItemKey-rangekey))
+          Exists Exists? Exists-name Exists-exists
+          Item Item? Item-name Item-type Item-value
+          ddbtype-symbol
+          ReturnValues
+          KeyVal KeyVal-type KeyVal-value
+          ItemKey ItemKey-hashkey ItemKey-rangekey))
 
 (: keyvalue-json (KeyVal -> JsObject))
 (define (keyvalue-json keyval)

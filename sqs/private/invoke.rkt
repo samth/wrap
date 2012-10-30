@@ -6,23 +6,23 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/httpclient:1/http/mimetype-const)
-	  X-WWW-FORM-URLENCODED)
- (only-in (planet rpr/httpclient:1/uri/url/param)
-	  Params Param params->query)
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../../httpclient/http/mimetype-const.rkt"
+          X-WWW-FORM-URLENCODED)
+ (only-in "../../../httpclient/uri/url/param.rkt"
+          Params Param params->query)
+ (only-in "../../../httpclient/http/header.rkt"
           Headers make-header header->string content-type)
- (only-in (planet rpr/httpclient:1/uri)
-	  Uri Uri-path make-uri uri->string)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  HTTPConnection-in
-	  HTTPPayload http-invoke)
- (only-in (planet rpr/format:1/xml/sxml)
-	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
+ (only-in "../../../httpclient/uri.rkt"
+          Uri Uri-path make-uri uri->string)
+ (only-in "../../../httpclient/http/http11.rkt"
+          HTTPConnection-in
+          HTTPPayload http-invoke)
+ (only-in "../../../format/xml/sxml.rkt"
+          Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
  (only-in "../../auth/authv2.rkt"
-	  authv2-signature)
+          authv2-signature)
  (only-in "../config.rkt"
-	  sqs-host sqs-auth-version sqs-api-version signature-method))
+          sqs-host sqs-auth-version sqs-api-version signature-method))
 
 (struct: SQSError () #:transparent)
 
@@ -56,9 +56,9 @@
 		   (lambda (ex) (SQSError))])
     (let ((http-headers '()))
       (let ((conn (http-invoke 'POST url http-headers payload)))
-	(pretty-print conn)
-	(let ((page (xml->sxml (HTTPConnection-in conn) '())))
-	  (resp-parser page))))))
+        (pretty-print conn)
+        (let ((page (xml->sxml (HTTPConnection-in conn) '())))
+          (resp-parser page))))))
 
 
 (: sqs-invoke (String Action Headers -> (U SQSError Void)))

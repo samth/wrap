@@ -8,15 +8,15 @@
  ListQueuesResp-result)
 
 (require
- (only-in (planet rpr/format:1/xml/sxml)
-	  Sxml SXPath 
-	  sxpath xml->sxml select-single-node-text)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  StatusLine)
+ (only-in "../../../format/xml/sxml.rkt"
+          Sxml SXPath 
+          sxpath xml->sxml select-single-node-text)
+ (only-in "../../../httpclient/http/http11.rkt"
+          StatusLine)
  (only-in (planet rpr/httpclient:1/http/header)
           Headers make-header)
  (only-in "invoke.rkt"
-	  SQSError sqs-invoke))
+          SQSError sqs-invoke))
 
 (struct: ListQueuesResp ([req-id : String]
 			 [queues : (Listof String)]

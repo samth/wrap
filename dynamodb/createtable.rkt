@@ -22,7 +22,7 @@
 
 (require 
  racket/pretty
- (only-in (planet rpr/format:1/json/tjson)
+ (only-in "../../format/json/tjson.rkt"
           Json JsObject JsObject? json->string) 
  (only-in "types.rkt"
           Throughput-write Throughput-read Throughput Throughput?

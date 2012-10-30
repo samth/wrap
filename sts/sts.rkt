@@ -5,24 +5,24 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/httpclient:1/uri)
-	  Uri make-uri uri->string)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in (planet rpr/httpclient:1/uri/url/param)
-	  Param Params params->query)
- (only-in (planet rpr/format:1/xml/sxml)
+ (only-in "../../httpclient/uri.rkt"
+          Uri make-uri uri->string)
+ (only-in "../../httpclient/http/http11.rkt"
+          HTTPConnection-in http-successful? http-close-connection http-invoke)
+ (only-in "../../httpclient/uri/url/param.rkt"
+          Param Params params->query)
+ (only-in "../../format/xml/sxml.rkt"
 	  Sxml SXPath sxpath xml->sxml extract-text extract-integer)
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../httpclient/http/header.rkt"
           Headers make-header)
  (only-in "../credential.rkt"
-  	  SessionCredential SessionCredential?)
+          SessionCredential SessionCredential?)
  (only-in "../auth/authv2.rkt"
-	  authv2-signature)
+          authv2-signature)
  (only-in "config.rkt"
-	  get-session-token-action sts-host sts-api-version)
+          get-session-token-action sts-host sts-api-version)
  (only-in "response.rkt"
-	  parse-session-response))
+          parse-session-response))
 
 (: request-headers Headers)
 (define request-headers  

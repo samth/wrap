@@ -24,20 +24,20 @@
 
 (require
  racket/pretty
- (only-in (planet rpr/format:1/json/tjson)
-	  Json JsObject JsObject? json->string jsobject)
+ (only-in "../../format/json/tjson.rkt"
+          Json JsObject JsObject? json->string jsobject)
  (only-in "action.rkt"
-	  DESCRIBE-TABLE)
+          DESCRIBE-TABLE)
  (only-in "invoke.rkt"
-	  dynamodb)
+          dynamodb)
  (only-in "parse.rkt"
-	  parse-capacity parse-key-schema
-	  invalid-error attr-value)
+          parse-capacity parse-key-schema
+          invalid-error attr-value)
  (only-in "types.rkt"
-	  TableStatus TableStatus? string->TableStatus
-	  KeySchema Throughput Throughput? DDBType? Key)
+          TableStatus TableStatus? string->TableStatus
+          KeySchema Throughput Throughput? DDBType? Key)
  (only-in "error.rkt"
-	  DDBFailure DDBFailure?))
+          DDBFailure DDBFailure?))
 
 ;; Some values are optional and/or set to 0 to support when a table is state transitioning i.e. deleting.
 (struct: DescribeTableResp ([name : String]

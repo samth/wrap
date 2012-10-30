@@ -18,29 +18,29 @@
 (require
  racket/pretty
  (only-in (planet lizorkin/sxml:2:1/sxml)
-	  sxpath sxml:text srl:sxml->html)
- (only-in (planet rpr/prelude:1/text/util)
-	  weave-string-separator)
-  (only-in (planet rpr/httpclient:1/uri/url/encode)
-	   url-encode-string)
- (only-in (planet rpr/httpclient:1/uri)
-	  make-uri uri->start-line-path-string)
- (only-in (planet rpr/httpclient:1/http/header)
-	  Header Headers host-header header->string)
- (only-in (planet rpr/httpclient:1/http/http11)
-	  http-invoke HTTPConnection-in)
- (only-in (planet rpr/prelude:1/type/date)
-	  current-date-string-iso-8601)
- (only-in (planet rpr/crypto:1/hmac)
-	  hmac-sha256)
- (only-in (planet rpr/crypto:1/base64)
-	  base64-encode)
+          sxpath sxml:text srl:sxml->html)
+ (only-in "../../prelude/text/util.rkt"
+          weave-string-separator)
+ (only-in "../../httpclient/uri/url/encode.rkt"
+          url-encode-string)
+ (only-in "../../httpclient/uri.rkt"
+          make-uri uri->start-line-path-string)
+ (only-in "../../httpclient/http/header.rkt"
+          Header Headers host-header header->string)
+ (only-in "../../httpclient/http/http11.rkt"
+          http-invoke HTTPConnection-in)
+ (only-in "../../prelude/type/date.rkt"
+          current-date-string-iso-8601)
+ (only-in "../../crypto/hmac.rkt"
+          hmac-sha256)
+ (only-in "../../crypto/base64.rkt"
+          base64-encode)
  (only-in "../configuration.rkt"
-	  a2s-ns a2s-host a2s-path)
+          a2s-ns a2s-host a2s-path)
  (only-in "../credential.rkt"
-	  current-aws-credential
-	  BaseCredential-secret-key
-	  BaseCredential-access-key))
+          current-aws-credential
+          BaseCredential-secret-key
+          BaseCredential-access-key))
 
 (: empty-response (List Symbol))
 (define empty-response '(*TOP*))
