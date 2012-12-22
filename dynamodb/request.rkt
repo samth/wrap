@@ -12,7 +12,7 @@
 
 (require
  (only-in  "../../format/json/tjson.rkt"
-           Json JsObject JsObject? json->string string->json 
+           Json JsObject json->string string->json 
            jsobject jsobject-add-attribute)
  (only-in "types.rkt"
           Exists Exists? Exists-name Exists-exists

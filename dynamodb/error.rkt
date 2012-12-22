@@ -32,7 +32,7 @@
 
 (require 
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject JsObject? json->string string->json jsobject))
+          Json JsObject json->string string->json jsobject))
 
 (struct: DDBFailure exn:fail () #:transparent)
 

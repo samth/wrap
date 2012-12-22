@@ -40,7 +40,7 @@
           current-date-string-rfc-2822
           current-date-string-iso-8601)
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject JsObject? read-json write-json)
+          Json JsObject read-json write-json)
  (only-in "error.rkt"
           DDBFailure DDBFailure? ddb-failure
           is-exception-response? throw)
@@ -91,10 +91,11 @@
       (let ((json (read-json (HTTPConnection-in conn))))
         (http-close-connection conn)
         ;;(pretty-print json)
-        (if (JsObject? json)
-            (if (is-exception-response? json)
-                (ddb-failure json)
-                json)
+        (if (hash? json)
+            (let: ((json : JsObject (cast json JsObject)))
+              (if (is-exception-response? json)
+                  (ddb-failure json)
+                  json))
             (error "Invalid DynamoDB response: not a Json Object"))))))
 
 (: sign-request (Params String -> String))

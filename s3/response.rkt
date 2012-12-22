@@ -19,19 +19,19 @@
 #lang racket/base
 
 (require net/head
-	 net/url
-	 xml/xml)
+         net/url
+         xml/xml)
 
 (provide s3-response? 
-	 s3-response-close
-	 s3-response-from-port  
-	 s3-response-debug-dump
-	 s3-http-header
-	 s3-http-code
-	 s3-http-version
-	 s3-http-message
-	 s3-http-response-fields
-	 s3-http-response-field)
+         s3-response-close
+         s3-response-from-port  
+         s3-response-debug-dump
+         s3-http-header
+         s3-http-code
+         s3-http-version
+         s3-http-message
+         s3-http-response-fields
+         s3-http-response-field)
 
 (define-struct s3-response (http port))
 
@@ -57,46 +57,46 @@
 (define (s3-response-headers response)
   (s3-response-http response))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; s3-response -> string
 ;; response -> "HTTP/1.1 403 Forbidden"
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define (s3-http-header s3-response)
   (header-extract s3-response #rx"(^HTTP/.*?)\r\n\r\n|\n\n|\r\r"))  
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Give a standard HTTP response string extract the code
 ;; "HTTP/1.1 403 Forbidden" -> 403
 ;; string -> number
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define (s3-http-code s3-response)
   (string->number (header-extract s3-response #rx"HTTP/[0-9][.][0-9] ([0-9]+) ")))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; "HTTP/1.1 403 Forbidden" -> "1.1"
 ;; s3-response? -> string
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define (s3-http-version s3-response)
   (header-extract s3-response #rx"HTTP/([0-9][.][0-9]) "))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; "HTTP/1.1 403 Forbidden" -> "Forbidden"
 ;; s3-response? -> string
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define (s3-http-message s3-response)
   (header-extract s3-response #rx"HTTP/[0-9][.][0-9] [0-9]+ (.+$)"))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; s3-response -> void
 ;; Dump out a response to the console
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define (s3-response-debug-dump s3-response)
   (display "---------S3 Response---------")(newline)
   (display (s3-response-http s3-response))
   (display "---------Payload-------------")(newline)
   (let ([inport (s3-response-port s3-response)])
     (if (equal? (s3-http-response-field "Content-Type" s3-response) "application/xml")
-       (display-xml (read-xml inport))
-       (display-pure-port inport))
+        (display-xml (read-xml inport))
+        (display-pure-port inport))
     (close-input-port inport)
     (newline)(display "---------End Payload---------")(newline)))

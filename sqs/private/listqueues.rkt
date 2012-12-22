@@ -13,14 +13,14 @@
           sxpath xml->sxml select-single-node-text)
  (only-in "../../../httpclient/http/http11.rkt"
           StatusLine)
- (only-in (planet rpr/httpclient:1/http/header)
+ (only-in "../../../httpclient/http/header.rkt"
           Headers make-header)
  (only-in "invoke.rkt"
           SQSError sqs-invoke))
 
 (struct: ListQueuesResp ([req-id : String]
-			 [queues : (Listof String)]
-			 [result : StatusLine]) #:transparent)
+                         [queues : (Listof String)]
+                         [result : StatusLine]) #:transparent)
 
 (: sqs-list-request ((Option String) -> Headers))
 (define (sqs-list-request name-prefix)
@@ -31,5 +31,5 @@
 (: list-queues ((Option String) -> (U SQSError Void)))
 (define (list-queues prefix)
   (sqs-invoke "/" 'ListQueues (sqs-list-request prefix)))
-    
-  
+
+

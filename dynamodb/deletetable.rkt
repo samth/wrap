@@ -25,7 +25,7 @@
 (require
  racket/pretty
  (only-in "../../format/json/tjson.rkt"
-	  Json JsObject JsObject? json->string jsobject)
+	  Json JsObject json->string jsobject)
  (only-in "types.rkt"
 	  Throughput
 	  TableStatus string->TableStatus)
@@ -36,7 +36,7 @@
  (only-in "invoke.rkt"
 	  dynamodb)
  (only-in "parse.rkt"
-	  invalid-error attr-value parse-capacity))
+	  invalid-error attr-value attr-value-jsobject parse-capacity))
 
 (struct: DeleteTableResp ([name : String]
 			  [status : TableStatus]
@@ -49,12 +49,13 @@
 
 (: parse-delete-table-resp (Json -> DeleteTableResp))
 (define (parse-delete-table-resp resp)
-  (if (JsObject? resp)
-      (let ((desc (attr-value resp 'TableDescription JsObject?)))
-        (let ((status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
-                        (if status status (invalid-error 'TableStatus resp))))
-              (name (attr-value desc 'TableName string?))
-              (capacity (parse-capacity (attr-value desc 'ProvisionedThroughput JsObject?))))
-          (DeleteTableResp name status capacity)))
+  (if (hash? resp)
+      (let: ((resp : JsObject (cast resp JsObject)))
+        (let ((desc (attr-value-jsobject resp 'TableDescription)))
+          (let ((status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
+                          (if status status (invalid-error 'TableStatus resp))))
+                (name (attr-value desc 'TableName string?))
+                (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput))))
+            (DeleteTableResp name status capacity))))
       (raise (invalid-error 'DeleteTable resp))))
 	  

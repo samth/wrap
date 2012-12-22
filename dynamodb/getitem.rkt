@@ -24,7 +24,7 @@
 (require
  (only-in "../../format/json/tjson.rkt"
           JsObject-empty
-          Json JsObject JsObject? json->string string->json jsobject
+          Json JsObject json->string string->json jsobject
           jsobject-add-attribute jsobject-remove-attribute)
  (only-in "../../prelude/std/opt.rkt"
           opt-orelse)
@@ -50,9 +50,9 @@
 (: get-item-request (String ItemKey (Listof String) Boolean -> String))
 (define (get-item-request table key attrs consistent?)
   (let ((req (jsobject `((TableName . ,table)
-			 (Key . ,(itemkey-json key))
-			 (AttributesToGet . ,attrs)
-			 (ConsistentRead . ,(if consistent? "true" "false"))))))
+                         (Key . ,(itemkey-json key))
+                         (AttributesToGet . ,attrs)
+                         (ConsistentRead . ,(if consistent? "true" "false"))))))
     (when (null? attrs)
       (jsobject-remove-attribute req 'AttributesToGet))
     (json->string req)))
@@ -61,9 +61,9 @@
 (define (get-item table item-key attrs consistent?)
   (let ((req (get-item-request table item-key attrs consistent?)))
     (let ((resp (dynamodb GET-ITEM req)))
-      (if (JsObject? resp)
-	  (parse-get-item-resp resp)
-	  (error "Invalid response ~a" resp)))))
+      (if (hash? resp)
+          (parse-get-item-resp (cast resp JsObject))
+          (error "Invalid response ~a" resp)))))
 
 ;;; Parse Response
 
@@ -71,9 +71,9 @@
 (define (parse-get-item-resp resp)
   (if (hash-has-key? resp 'ConsumedCapacityUnits)
       (let ((jconsumed (parse-consumed-capacity resp)))
-	(let ((items (hash-ref resp 'Item (lambda: () JsObject-empty))))
-	  (if (JsObject? items)
-	      (GetItemResp (parse-items items) jconsumed)
-	      (parse-fail resp))))
+        (let ((items (hash-ref resp 'Item (lambda: () JsObject-empty))))
+          (if (hash? items)
+              (GetItemResp (parse-items (cast items JsObject)) jconsumed)
+              (parse-fail resp))))
       (parse-fail resp)))
 

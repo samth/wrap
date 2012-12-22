@@ -7,7 +7,7 @@
 (require
  racket/pretty
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject JsObject? jsobject json->string)
+          Json JsObject jsobject json->string)
  (only-in "error.rkt"
           illformed-response)
  (only-in "types.rkt"
@@ -74,11 +74,13 @@
                  KeyVal (Option Range) Boolean (Option ItemKey) -> QueryResp))
 (define (query table fields limit consistent? count? hash-key range forward? exclusive-start-key)
   (let ((resp (dynamodb QUERY (query-request table fields limit consistent? count? hash-key range forward? exclusive-start-key))))
-    (if (JsObject? resp)
-        (let: ((items-js : Json (hash-ref resp 'Items)))
+    (if (hash? resp)
+        (let*: ((resp : JsObject (cast resp JsObject))
+                (items-js : Json (hash-ref resp 'Items)))
           (if (and (list? items-js)
-                   (andmap JsObject? items-js))
-              (let ((items (map parse-items items-js)))
+                   (andmap hash? items-js))
+              (let* ((items-js (cast items-js (Listof JsObject)))
+                     (items (map parse-items items-js)))
                 (let ((last-key (parse-last-key resp))
                       (consumed (parse-consumed-capacity resp))
                       (count (parse-positive-integer resp 'Count)))

@@ -23,7 +23,7 @@
 (require 
  racket/pretty
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject JsObject? json->string) 
+          Json JsObject json->string) 
  (only-in "types.rkt"
           Throughput-write Throughput-read Throughput Throughput?
           DDBType ddbtype-code)
@@ -39,7 +39,7 @@
           dynamodb)
  (only-in "parse.rkt"
           invalid-error parse-capacity
-          attr-value parse-key-schema))
+          attr-value attr-value-jsobject parse-key-schema))
 
 (struct: CreateTableResp ([name : String]
                           [status : TableStatus]
@@ -80,13 +80,14 @@
 
 (: parse-create-table-resp (Json -> CreateTableResp))
 (define (parse-create-table-resp resp)
-  (if (JsObject? resp)
-      (let ((desc (attr-value resp 'TableDescription JsObject?)))
-        (let ((name (attr-value desc 'TableName string?))
-              (schema (parse-key-schema (attr-value desc 'KeySchema JsObject?)))
-              (creation (attr-value desc 'CreationDateTime flonum?))
-              (capacity (parse-capacity (attr-value desc 'ProvisionedThroughput JsObject?)))
-              (status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
-                        (if status status (invalid-error 'TablesStatus desc)))))
-          (CreateTableResp name status creation capacity schema)))
+  (if (hash? resp)
+      (let: ((resp : JsObject (cast resp JsObject)))
+        (let ((desc (attr-value-jsobject resp 'TableDescription)))
+          (let ((name (attr-value desc 'TableName string?))
+                (schema (parse-key-schema (attr-value-jsobject desc 'KeySchema)))
+                (creation (attr-value desc 'CreationDateTime flonum?))
+                (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput)))
+                (status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
+                          (if status status (invalid-error 'TablesStatus desc)))))
+            (CreateTableResp name status creation capacity schema))))
       (raise (invalid-error 'TableDescription resp))))

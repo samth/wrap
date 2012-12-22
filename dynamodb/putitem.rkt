@@ -25,7 +25,7 @@
 (require 
  racket/pretty
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject JsObject? json->string 
+          Json JsObject json->string 
           jsobject jsobject-add-attribute)
  (only-in "action.rkt"
           PUT-ITEM)
@@ -67,8 +67,8 @@
 (: put-item (String (Listof Item) (Option (U Exists Item)) ReturnValues -> PutItemResp))
 (define (put-item name items expected return-values)
   (let ((resp (dynamodb PUT-ITEM (put-item-request name items expected return-values))))
-    (if (JsObject? resp)
-        (parse-put-item-resp resp)
+    (if (hash? resp)
+        (parse-put-item-resp (cast resp JsObject))
         (illformed-response (json->string resp)))))
 
 (: parse-put-item-resp (JsObject -> PutItemResp))
@@ -87,13 +87,14 @@
   
   (: parse-item (Symbol Json -> Item))
   (define (parse-item name json-value)
-    (if (JsObject? json-value)
-        (cond
-          ((hash-has-key? json-value 'N)
-           (Item (symbol->string name) (extract-string-value json-value 'N) 'Number))
-          ((hash-has-key? json-value 'S)
-           (Item (symbol->string name) (extract-string-value json-value 'S) 'String))
-          (else 	(invalid-error name json-value)))
+    (if (hash? json-value)
+        (let ((jsobject (cast json-value JsObject)))
+          (cond
+            ((hash-has-key? jsobject 'N)
+             (Item (symbol->string name) (extract-string-value jsobject 'N) 'Number))
+            ((hash-has-key? jsobject 'S)
+             (Item (symbol->string name) (extract-string-value jsobject 'S) 'String))
+            (else 	(invalid-error name jsobject))))
         (invalid-error name json-value)))
   
   (: consumed (JsObject -> Float))
@@ -104,8 +105,8 @@
           0.00)))
   
   (let ((attrs (hash-ref jsobj 'Attributes (lambda () ((inst make-hasheq Symbol Json))))))
-    (if (JsObject? attrs)
-        (let ((attrs ((inst hash->list Symbol Json) attrs)))
+    (if (hash? attrs)
+        (let ((attrs ((inst hash->list Symbol Json) (cast attrs JsObject))))
           (PutItemResp (map (lambda: ((attr : (Pair Symbol Json)))
                               (parse-item (car attr) (cdr attr)))
                             attrs)
