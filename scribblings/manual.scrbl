@@ -5,7 +5,7 @@
        (require (for-label (only-meta-in 0 typed/racket)))]
        
 @title[#:tag "top"]{@bold{AWS}: SQS - Amazon WebServices}
-@declare-exporting[(planet rpr/aws:1)]
+@declare-exporting[aws]
 
 by Ray Racine (@tt{ray dot racine at gmail dot com})
 
@@ -52,7 +52,7 @@ Currently this library expects and requires that a valid set of credentials is l
 
 @subsubsection{AWS Credentials}
 
-@defmodule[(planet rpr/aws/credential)]
+@defmodule[aws/credential]
 
 @defproc[(current-aws-credential) (Parameterof AwsCredential)]{
 A parameterization containing the credentials used by this library authorizing an AWS call.  An initial set of credential information is loaded during module initialization from a given path.  Module initialization will fail if the expected credential file is not found.
@@ -187,7 +187,7 @@ Deletes an S3 stored object.
 
 @subsection{SQS}
 
-@defmodule[(planet rpr/aws/sqs/sqs)]
+@defmodule[aws/sqs/sqs]
 
 @defproc[(list-queues [prefix (Option String)]) (U SQSError SQSListQueuesResp)]{
 List all SQS queues.  If the optional prefix is provided only those queues starting
