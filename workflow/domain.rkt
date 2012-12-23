@@ -7,7 +7,7 @@
  (only-in "../dynamodb/invoke.rkt"
           workflow)
  (only-in "../dynamodb/parse.rkt"
-          attr-value-jsobject attr-value-jslist attr-value) 
+          attr-value-jsobject attr-value-jslist attr-value-string) 
  (only-in "types.rkt"          
           WFResponseCode))
 
@@ -59,29 +59,29 @@
 (define (parse-domain-description-response jsobj)  
   (let ((info (attr-value-jsobject jsobj 'domainInfo ))
         (config (attr-value-jsobject jsobj 'configuration)))    
-    (DomainDescription (attr-value info 'name string?)
-                       (attr-value info 'description string?)
-                       (parse-status (attr-value info 'status string?))
-                       (parse-duration (attr-value config 'workflowExecutionRetentionPeriodInDays string?)))))
+    (DomainDescription (attr-value-string info 'name)
+                       (attr-value-string info 'description)
+                       (parse-status (attr-value-string info 'status))
+                       (parse-duration (attr-value-string config 'workflowExecutionRetentionPeriodInDays)))))
 
 (: describe-domain (String -> DomainInfo))
 (define (describe-domain name)  
   (let: ((payload : JsObject (jsobject `((name . ,name)))))                                             
-    (parse-domain-info-response (cast (workflow describe-domain-target payload) JsObject))))
+    (parse-domain-description-response (cast (workflow describe-domain-target payload) JsObject))))
 
 ;; Deprecate Domain API call
 (: deprecate-domain (String -> Void))
 (define (deprecate-domain name)
-  (workflow deprecate-domain-target (jsobject `((name . ,name))))
+  ;(workflow deprecate-domain-target (jsobject `((name . ,name))))
   (void))
 
 ;; List Domains API call
 
 (: parse-domain-info-response (JsObject -> DomainInfo))
 (define (parse-domain-info-response jsobj)  
-  (DomainInfo (attr-value jsobj 'name string?)
-              (attr-value jsobj 'description string?)
-              (parse-status (attr-value jsobj 'status string?))))
+  (DomainInfo (attr-value-string jsobj 'name)
+              (attr-value-string jsobj 'description)
+              (parse-status (attr-value-string jsobj 'status))))
 
 (: parse-list-domains-response (JsObject -> (Listof DomainInfo)))
 (define(parse-list-domains-response resp)
