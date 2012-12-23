@@ -23,7 +23,7 @@
 (require 
  racket/pretty
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject json->string) 
+          Json JsObject jsobject json->string) 
  (only-in "types.rkt"
           Throughput-write Throughput-read Throughput Throughput?
           DDBType ddbtype-code)
@@ -55,10 +55,10 @@
     
     (: key-json (Key -> JsObject))
     (define (key-json key)
-      (make-hasheq `((AttributeName . ,(Key-name key))
-                     (AttributeType . ,(ddbtype-code (Key-type key))))))
+      (jsobject `((AttributeName . ,(Key-name key))
+                  (AttributeType . ,(ddbtype-code (Key-type key))))))
     
-    (let: ((keys : JsObject (make-hasheq)))
+    (let: ((keys : JsObject (jsobject '())))
       (hash-set! keys 'HashKeyElement (key-json hash-key))
       (when range-key
         (hash-set! keys 'RangeKeyElement (key-json range-key)))
@@ -66,12 +66,12 @@
   
   (: throughput-json (Throughput -> JsObject))
   (define (throughput-json throughput)
-    (make-hasheq `((ReadCapacityUnits . ,(Throughput-read throughput))
-                   (WriteCapacityUnits . ,(Throughput-write throughput)))))
+    (jsobject `((ReadCapacityUnits . ,(Throughput-read throughput))
+                (WriteCapacityUnits . ,(Throughput-write throughput)))))
   
-  (json->string (make-hasheq `((TableName . ,name)
-                               (KeySchema . ,(keys-json hash-key range-key))
-                               (ProvisionedThroughput . ,(throughput-json throughput))))))
+  (json->string (jsobject `((TableName . ,name)
+                            (KeySchema . ,(keys-json hash-key range-key))
+                            (ProvisionedThroughput . ,(throughput-json throughput))))))
 
 (: create-table (String Key (Option Key) Throughput -> CreateTableResp))
 (define (create-table name hash-key range-key throughput) 
