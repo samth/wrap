@@ -18,7 +18,7 @@
 
 #lang typed/racket/base
 
-(provide dynamodb)
+(provide dynamodb workflow)
 
 (require
  (only-in racket/pretty
@@ -40,10 +40,11 @@
           current-date-string-rfc-2822
           current-date-string-iso-8601)
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject read-json write-json)
+          Json JsObject json->string read-json write-json)
  (only-in "error.rkt"
-          DDBFailure DDBFailure? ddb-failure
-          is-exception-response? throw)
+          AWSFailure
+          aws-failure
+          is-exception-response?)
  (only-in "../sts/session.rkt"
           ensure-session)
  (only-in "../auth/authv3.rkt"
@@ -63,7 +64,11 @@
    ;; (make-header-string "User-Agent" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.2 Safari/535.11")
    (make-header "User-Agent" "Googlebot/2.1 (+http://www.google.com/bot.html)")
    (make-header "Accept-Encoding" "gzip")
+   
+   ;; Below for Dynamodb.
    (make-header "Content-Type" "application/x-amz-json-1.0")
+   ;; For Workflow
+   ;(make-header "Content-Type" "application/json; charset=UTF-8")
    (make-header "Connection" "Close")))
 
 (: date-header (-> Header))
@@ -94,22 +99,22 @@
         (if (hash? json)
             (let: ((json : JsObject (cast json JsObject)))
               (if (is-exception-response? json)
-                  (ddb-failure json)
+                  (aws-failure json)
                   json))
             (error "Invalid DynamoDB response: not a Json Object"))))))
 
-(: sign-request (Params String -> String))
-(define (sign-request params body)
-  (string-append "Signature=" (auth-signature ddb-host params body)))
+(: sign-request (String Params String -> String))
+(define (sign-request host params body)
+  (string-append "Signature=" (auth-signature host params body)))
 
-(: authorization-header (Params String SessionCredential -> Param))
-(define (authorization-header headers body session-cred)
+(: authorization-header (String Params String SessionCredential -> Param))
+(define (authorization-header host headers body session-cred)
   (param "x-amzn-authorization"
          (string-append "AWS3 AWSAccessKeyId=" 
                         (BaseCredential-access-key session-cred)
                         ",Algorithm=HmacSHA256,"
                         ;; "SignedHeaders=host;x-amz-date;x-amz-target;x-amz-security-token,"
-                        (sign-request headers body))))
+                        (sign-request host headers body))))
 
 (: dynamodb (String String -> Json))
 (define (dynamodb cmd cmd-body)
@@ -120,8 +125,28 @@
              (stok (SessionCredential-token scred)))
         (let ((url (make-uri "http" #f ddb-host 80 "/" #f #f))
               (auth-hdrs (auth-headers cmd stok)))
-          (let* ((auth (authorization-header auth-hdrs cmd-body scred))
+          (let* ((auth (authorization-header ddb-host auth-hdrs cmd-body scred))
                  (hdrs (cons auth auth-hdrs))
                  (shdrs (append hdrs request-headers)))
             (dynamodb-invoke url shdrs cmd-body))))
       (error "DynamoDB failed to obtain a valid session token")))
+
+(: make-service-invoker (String -> (String JsObject -> Json)))
+(define (make-service-invoker host)
+  (λ: ((target : String) (payload : JsObject))    
+    (if (ensure-session)
+        (let* ((scred (let ((scred (AwsCredential-session (current-aws-credential))))
+                        (if scred scred (error "Failure to obtain session credentials"))))
+               (stok (SessionCredential-token scred)))
+          (let ((url (make-uri "http" #f host 80 "/" #f #f))
+                (auth-hdrs (auth-headers target stok))
+                (payload (json->string payload)))
+            (pretty-print url)
+            (let* ((auth (authorization-header host auth-hdrs payload scred))
+                   (hdrs (cons auth auth-hdrs))
+                   (shdrs (append hdrs request-headers)))
+              (dynamodb-invoke url shdrs payload))))
+        (error "Failed to obtain a valid session token"))))
+
+(: workflow (String JsObject -> Json))
+(define workflow (make-service-invoker "swf.us-east-1.amazonaws.com"))
