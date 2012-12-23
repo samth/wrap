@@ -1,12 +1,13 @@
 #lang typed/racket/base
 
 (provide
- invalid-error attr-value attr-value-jsobject
+ invalid-error attr-value attr-value-jsobject attr-value-jslist
  parse-capacity parse-key-schema)
 
 (require  
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject json->string 
+          Json JsObject JsList
+          json->string 
           jsobject)
  (only-in "types.rkt"
           string->DDBType
@@ -36,9 +37,13 @@
 (: attr-value-jsobject (JsObject Symbol -> JsObject))
 (define (attr-value-jsobject jsobj attr)
   (let ((json (attr-value jsobj attr hash?)))
-    (cast json JsObject)
-    (invalid-error attr jsobj)))
+    (cast json JsObject)))    
 
+(: attr-value-jslist (JsObject Symbol -> JsList))
+(define (attr-value-jslist jsobj attr)
+  (let ((json (attr-value jsobj attr list?)))
+    (cast json JsList)))
+   
 (: parse-capacity (JsObject -> Throughput))
 (define (parse-capacity jsobj)
   (let ((write (attr-value jsobj 'WriteCapacityUnits exact-integer?))
