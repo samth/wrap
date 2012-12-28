@@ -28,7 +28,7 @@
           Throughput-write Throughput-read Throughput Throughput?
           DDBType ddbtype-code)
  (only-in "error.rkt"
-          DDBFailure DDBFailure?)
+          AWSFailure)          
  (only-in "action.rkt"
           CREATE-TABLE)
  (only-in "types.rkt"

@@ -1,7 +1,8 @@
 #lang typed/racket/base
 
 (provide
- invalid-error attr-value attr-value-jsobject attr-value-jslist
+ invalid-error 
+ attr-value attr-value-string attr-value-jsobject attr-value-jslist
  parse-capacity parse-key-schema)
 
 (require  
@@ -33,6 +34,10 @@
             json
             (invalid-error attr json)))
       (invalid-error attr jsobj)))
+
+(: attr-value-string (JsObject Symbol -> String))
+(define (attr-value-string jsobj attr)
+  (attr-value jsobj attr string?))
 
 (: attr-value-jsobject (JsObject Symbol -> JsObject))
 (define (attr-value-jsobject jsobj attr)

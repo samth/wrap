@@ -9,7 +9,7 @@
  (only-in "../../format/json/tjson.rkt"
           Json JsObject jsobject json->string)
  (only-in "error.rkt"
-          illformed-response)
+          malformed-response)          
  (only-in "types.rkt"
           Range Range-values Range-operator
           ddbtype-symbol
@@ -86,5 +86,5 @@
                       (count (parse-positive-integer resp 'Count)))
                   (QueryResp last-key consumed count items)))
               (parse-fail resp)))
-        (illformed-response (string-append "Unparsable response from query of " table)))))
+        (malformed-response (string-append "Unparsable response from query of " table)))))
 

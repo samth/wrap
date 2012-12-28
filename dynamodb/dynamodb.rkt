@@ -38,50 +38,46 @@
  Item Item? Item-name Item-value Item-type
  ItemVal
  ItemUpdate
- Throughput Throughput? Throughput-read Throughput-write
- DDBFailure DDBFailure? ConditionalCheckFailed?
- InvokeConditionsNotMet InvokeConditionsNotMet?
+ Throughput Throughput? Throughput-read Throughput-write 
  Range Range? Range-values Range-operator
  query QueryResp QueryResp? QueryResp-lastkey QueryResp-consumed QueryResp-count QueryResp-items)
 
 (require
- (only-in "error.rkt"
-	  InvokeConditionsNotMet InvokeConditionsNotMet?
-	  DDBFailure DDBFailure?
-	  ConditionalCheckFailed?)
+ (only-in "error.rkt" 
+          AWSFailure)	  
  (only-in "types.rkt"
-	  Throughput Throughput? Throughput-read Throughput-write
-	  Key Key? Key-name Key-type
-	  KeyVal KeyVal? KeyVal-value KeyVal-type
-	  Exists Exists? ReturnValues
-	  ItemKey ItemKey? ItemKey-hashkey ItemKey-rangekey
-	  Item Item? Item-name Item-type Item-value
-	  ItemUpdate ItemVal
-	  Range Range? Range-values Range-operator)
+          Throughput Throughput? Throughput-read Throughput-write
+          Key Key? Key-name Key-type
+          KeyVal KeyVal? KeyVal-value KeyVal-type
+          Exists Exists? ReturnValues
+          ItemKey ItemKey? ItemKey-hashkey ItemKey-rangekey
+          Item Item? Item-name Item-type Item-value
+          ItemUpdate ItemVal
+          Range Range? Range-values Range-operator)
  (only-in "createtable.rkt"
-	  create-table CreateTableResp)
+          create-table CreateTableResp)
  (only-in "deletetable.rkt"
-	  delete-table DeleteTableResp)
+          delete-table DeleteTableResp)
  (only-in "describetable.rkt"
-	  describe-table DescribeTableResp DescribeTableResp?)
+          describe-table DescribeTableResp DescribeTableResp?)
  (only-in "listtable.rkt"
-	  list-tables ListTablesResp ListTablesResp?)
+          list-tables ListTablesResp ListTablesResp?)
  (only-in "getitem.rkt"
-	  get-item GetItemResp GetItemResp? GetItemResp-consumed GetItemResp-items)
+          get-item GetItemResp GetItemResp? GetItemResp-consumed GetItemResp-items)
  (only-in "putitem.rkt"
-	  put-item
-	  PutItemResp PutItemResp?)
+          put-item
+          PutItemResp PutItemResp?)
  (only-in "deleteitem.rkt"
-	  delete-item DeleteItemResult)
+          delete-item DeleteItemResult)
  (only-in "updateitem.rkt"
-	  update-item UpdateItemResp)
+          update-item UpdateItemResp)
  (only-in "scan.rkt"
-	  scan Filter
-	  ScanResp ScanResp? ScanResp-lastkey 
-	  ScanResp-consumed ScanResp-count
-	  ScanResp-scanned ScanResp-items)
+          scan Filter
+          ScanResp ScanResp? ScanResp-lastkey 
+          ScanResp-consumed ScanResp-count
+          ScanResp-scanned ScanResp-items)
  (only-in "query.rkt"
-	  query QueryResp QueryResp? 
-	  QueryResp-items QueryResp-count
-	  QueryResp-consumed QueryResp-lastkey))
+          query QueryResp QueryResp? 
+          QueryResp-items QueryResp-count
+          QueryResp-consumed QueryResp-lastkey))
 

@@ -35,7 +35,7 @@
           Item Item?
           DDBType ddbtype-symbol)
  (only-in "error.rkt" 
-          DDBFailure DDBFailure? illformed-response)
+          AWSFailure)          
  (only-in "invoke.rkt"
           dynamodb)
  (only-in "request.rkt"
@@ -66,10 +66,7 @@
 
 (: put-item (String (Listof Item) (Option (U Exists Item)) ReturnValues -> PutItemResp))
 (define (put-item name items expected return-values)
-  (let ((resp (dynamodb PUT-ITEM (put-item-request name items expected return-values))))
-    (if (hash? resp)
-        (parse-put-item-resp (cast resp JsObject))
-        (illformed-response (json->string resp)))))
+  (parse-put-item-resp (cast (dynamodb PUT-ITEM (put-item-request name items expected return-values)) JsObject)))
 
 (: parse-put-item-resp (JsObject -> PutItemResp))
 (define (parse-put-item-resp jsobj)

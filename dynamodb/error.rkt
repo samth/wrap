@@ -22,9 +22,10 @@
 
 (provide
  AWSFailure
+ malformed-response
  ;throw 
  is-exception-response? aws-failure)
- 
+
 (require 
  (only-in "../../format/json/tjson.rkt"
           Json JsObject json->string string->json jsobject))

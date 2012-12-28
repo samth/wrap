@@ -6,13 +6,12 @@
  ScanResp-consumed ScanResp-count
  ScanResp-scanned ScanResp-items)
 
-(require 
- racket/pretty
+(require  
  (only-in "../../format/json/tjson.rkt"
           Json JsObject JsObject-empty
           json->string jsobject jsobject-add-attribute)
  (only-in "error.rkt"
-          illformed-response)
+          malformed-response)          
  (only-in "action.rkt"
           SCAN)
  (only-in "invoke.rkt"
@@ -88,5 +87,5 @@
                       (ScanResp last-key consumed count scanned items)
                       (parse-fail resp))))
               (parse-fail resp)))
-        (illformed-response (string-append "Unparsable response from in scanning " table)))))
+        (malformed-response (string-append "Unparsable response from in scanning " table)))))
 

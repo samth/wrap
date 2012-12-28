@@ -25,22 +25,22 @@
 (require
  racket/pretty
  (only-in "../../format/json/tjson.rkt"
-	  Json JsObject json->string jsobject)
+          Json JsObject json->string jsobject)
  (only-in "types.rkt"
-	  Throughput
-	  TableStatus string->TableStatus)
+          Throughput
+          TableStatus string->TableStatus)
  (only-in "error.rkt"
-	  DDBFailure DDBFailure?)
+          AWSFailure)	  
  (only-in "action.rkt"
-	  DELETE-TABLE)
+          DELETE-TABLE)
  (only-in "invoke.rkt"
-	  dynamodb)
+          dynamodb)
  (only-in "parse.rkt"
-	  invalid-error attr-value attr-value-jsobject parse-capacity))
+          invalid-error attr-value attr-value-jsobject parse-capacity))
 
 (struct: DeleteTableResp ([name : String]
-			  [status : TableStatus]
-			  [capacity : Throughput]) #:transparent)
+                          [status : TableStatus]
+                          [capacity : Throughput]) #:transparent)
 
 (: delete-table (String -> DeleteTableResp))
 (define (delete-table name)
@@ -58,4 +58,4 @@
                 (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput))))
             (DeleteTableResp name status capacity))))
       (raise (invalid-error 'DeleteTable resp))))
-	  
+

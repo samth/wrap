@@ -9,18 +9,19 @@
  (only-in "../dynamodb/parse.rkt"
           attr-value-jsobject attr-value-jslist attr-value-string) 
  (only-in "types.rkt"          
-          WFResponseCode))
+          Duration
+          WFResponseCode)
+ (only-in "attrs.rkt"
+          duration->string))
 
 (define register-domain-target  "SimpleWorkflowService.RegisterDomain")
 (define deprecate-domain-target "SimpleWorkflowService.DeprecateDomain")
 (define describe-domain-target  "SimpleWorkflowService.DescribeDomain")
 (define list-domains-target     "SimpleWorkflowService.ListDomains")
 
-(: register-domain (String String (U Natural 'NONE) -> WFResponseCode))
+(: register-domain (String String Duration -> WFResponseCode))
 (define (register-domain name desc retention-days)
-  (let ((sdays (if (number? retention-days)
-                   (number->string retention-days)
-                   (symbol->string retention-days))))
+  (let ((sdays (duration->string retention-days)))                   
     (let: ((payload : JsObject (jsobject `((name . ,name)
                                            (description . ,desc)
                                            (workflowExecutionRetentionPeriodInDays . ,sdays)))))
