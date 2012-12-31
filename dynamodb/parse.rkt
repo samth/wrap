@@ -2,11 +2,13 @@
 
 (provide
  invalid-error 
- attr-value attr-value-string attr-value-jsobject attr-value-jslist
+ attr-value 
+ attr-value-string attr-value-integer
+ attr-value-jsobject attr-value-jslist
  parse-capacity parse-key-schema)
 
 (require  
- (only-in "../../format/json/tjson.rkt"
+ (only-in format/json/tjson
           Json JsObject JsList
           json->string 
           jsobject)
@@ -38,6 +40,10 @@
 (: attr-value-string (JsObject Symbol -> String))
 (define (attr-value-string jsobj attr)
   (attr-value jsobj attr string?))
+
+(: attr-value-integer (JsObject Symbol -> Integer))
+(define (attr-value-integer jsobj attr)
+  (attr-value jsobj attr exact-integer?))
 
 (: attr-value-jsobject (JsObject Symbol -> JsObject))
 (define (attr-value-jsobject jsobj attr)
