@@ -40,7 +40,7 @@
           current-date-string-rfc-2822
           current-date-string-iso-8601)
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject json->string read-json write-json)
+          Json JsObject json->jsobject json->string read-json write-json)
  (only-in "error.rkt"
           AWSFailure
           aws-failure
@@ -144,8 +144,14 @@
             (let* ((auth (authorization-header host auth-hdrs payload scred))
                    (hdrs (cons auth auth-hdrs))
                    (shdrs (append hdrs request-headers)))
-              (dynamodb-invoke url shdrs payload))))
+              (json->jsobject (dynamodb-invoke url shdrs payload)))))
         (error "Failed to obtain a valid session token"))))
 
-(: workflow (String JsObject -> Json))
-(define workflow (make-service-invoker "swf.us-east-1.amazonaws.com"))
+
+;; FIXME RPR - NEED TO VERIFY DYNAMODB ALWAYS RESPONDS WITH A JSOBJECT
+(: workflow-invoker (String JsObject -> Json))
+(define workflow-invoker (make-service-invoker "swf.us-east-1.amazonaws.com"))
+
+(: workflow (String JsObject -> JsObject))
+(define workflow (λ: ((target : String) (payload : JsObject))
+                   (json->jsobject (workflow-invoker target payload))))
