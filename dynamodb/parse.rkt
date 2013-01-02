@@ -2,8 +2,10 @@
 
 (provide
  invalid-error 
- attr-value 
- attr-value-string attr-value-integer
+ attr-value attr-value-opt
+ attr-value-string attr-value-string-opt
+ attr-value-integer attr-value-integer-opt 
+ attr-value-real attr-value-real-opt
  attr-value-jsobject attr-value-jslist
  parse-capacity parse-key-schema)
 
@@ -37,13 +39,38 @@
             (invalid-error attr json)))
       (invalid-error attr jsobj)))
 
+(: attr-value-opt (All (A) JsObject Symbol (Json -> Boolean : A) -> (Option A)))
+(define (attr-value-opt jsobj attr type-of?)
+  (if (hash-has-key? jsobj attr)
+      (let ((json (hash-ref jsobj attr)))
+        (if (type-of? json)
+            json
+            #f))
+      #f))
+
 (: attr-value-string (JsObject Symbol -> String))
 (define (attr-value-string jsobj attr)
   (attr-value jsobj attr string?))
 
+(: attr-value-string-opt (JsObject Symbol -> (Option String)))
+(define (attr-value-string-opt jsobj attr)
+  (attr-value-opt jsobj attr string?))
+
 (: attr-value-integer (JsObject Symbol -> Integer))
 (define (attr-value-integer jsobj attr)
   (attr-value jsobj attr exact-integer?))
+
+(: attr-value-integer-opt (JsObject Symbol -> (Option Integer)))
+(define (attr-value-integer-opt jsobj attr)
+  (attr-value-opt jsobj attr exact-integer?))
+
+(: attr-value-real (JsObject Symbol -> Real))
+(define (attr-value-real jsobj attr)
+  (attr-value jsobj attr inexact-real?))
+
+(: attr-value-real-opt (JsObject Symbol -> (Option Real)))
+(define (attr-value-real-opt jsobj attr)
+  (attr-value-opt jsobj attr inexact-real?))
 
 (: attr-value-jsobject (JsObject Symbol -> JsObject))
 (define (attr-value-jsobject jsobj attr)

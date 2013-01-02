@@ -31,7 +31,9 @@
           Uri Uri-query make-uri parse-uri uri->string)
  (only-in "../../httpclient/http/http11.rkt"
           HTTPPayload HTTPConnection-in 
-          http-successful? http-close-connection http-invoke)
+          http-status StatusLine-code StatusLine-msg
+          http-successful? http-has-content?
+          http-close-connection http-invoke)
  (only-in "../../httpclient/uri/url/param.rkt"
           param Param Params encode-param)
  (only-in "../../httpclient/http/header.rkt"
@@ -40,7 +42,9 @@
           current-date-string-rfc-2822
           current-date-string-iso-8601)
  (only-in "../../format/json/tjson.rkt"
-          Json JsObject json->jsobject json->string read-json write-json)
+          Json JsObject jsobject 
+          json->jsobject json->string 
+          read-json write-json)
  (only-in "error.rkt"
           AWSFailure
           aws-failure
@@ -85,23 +89,30 @@
 
 (: dynamodb-invoke (Uri Headers String -> JsObject))
 (define (dynamodb-invoke url headers payload)
-  (with-handlers ([exn:fail?
-                   (lambda (ex) 
-                     (pretty-print ex)
-                     (raise ex #t))])
-    (let ((conn (http-invoke 'POST url headers 
-                             (HTTPPayload "application/x-amz-json-1.0"
-                                          #f #f (open-input-string payload)))))
-      ;;(pretty-print headers)
-      (let ((json (read-json (HTTPConnection-in conn))))
-        (http-close-connection conn)
-        ;;(pretty-print json)
-        (if (hash? json)
-            (let: ((json : JsObject (cast json JsObject)))
-              (if (is-exception-response? json)
-                  (aws-failure json)
-                  json))
-            (error "Invalid DynamoDB response: not a Json Object"))))))
+ ; (with-handlers ([exn:fail?
+ ;                  (lambda (ex) 
+ ;                    (pretty-print ex)
+ ;                    (raise ex #t))])
+  (let ((conn (http-invoke 'POST url headers 
+                           (HTTPPayload "application/x-amz-json-1.0"
+                                        #f #f (open-input-string payload)))))
+    (if (http-successful? conn)
+        (if (http-has-content? conn)
+            (let ((json (read-json (HTTPConnection-in conn))))
+              (http-close-connection conn)
+              ;;(pretty-print json)
+              (if (hash? json)
+                  (let: ((json : JsObject (cast json JsObject)))
+                    (if (is-exception-response? json)
+                        (aws-failure json)
+                        json))
+                  (error "Invalid DynamoDB response: not a Json Object")))
+            (jsobject '()))
+        (let ((status (http-status conn)))
+          (error 'dynamodb-invoke "HTTP failure ~s: ~s" 
+                 (StatusLine-code status)
+                 (StatusLine-msg status))))))
+
 
 (: sign-request (String Params String -> String))
 (define (sign-request host params body)
@@ -144,7 +155,7 @@
             (let* ((auth (authorization-header host auth-hdrs payload scred))
                    (hdrs (cons auth auth-hdrs))
                    (shdrs (append hdrs request-headers)))
-              (json->jsobject (dynamodb-invoke url shdrs payload)))))
+              (dynamodb-invoke url shdrs payload))))
         (error "Failed to obtain a valid session token"))))
 
 
