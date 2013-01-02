@@ -19,6 +19,7 @@
 #lang typed/racket/base
 
 (provide 
+ get-object head-object
  list-bucket-objects
  put-object delete-object
  put-file-object)
@@ -60,7 +61,8 @@
  (only-in "configuration.rkt"
           nss)
  (only-in "invoke.rkt"
-          make-base-uri make-empty-error-response s3-invoke
+          make-base-uri make-empty-error-response 
+          s3-invoke s3-get-object s3-get-object-pipe-to-file
           S3Response S3Response-sxml
           S3Payload))
 
@@ -68,26 +70,26 @@
 
 (: list-bucket-objects (String String String String Integer -> Keys))
 (define (list-bucket-objects bucket prefix delimiter marker max)
-
+  
   (: s->i (String -> (Option Integer)))
   (define (s->i s)
     (let ((i (string->number s)))
       (if (exact-integer? i)
-	  i
-	  #f)))
-
+          i
+          #f)))
+  
   (: s->b (String -> Boolean))
   (define (s->b s)
     (not (string=? s "false")))
-
+  
   (: parse-owner (Sxml -> Owner))
   (define (parse-owner sxml)
     (define sx-id (select-single-node-text "/s3:Owner/s3:ID" nss))
     (define sx-name (select-single-node-text "/s3:Owner/s3:DisplayName" nss))
     (let ((id (sx-id sxml))
-	  (name (sx-name sxml)))
+          (name (sx-name sxml)))
       (Owner id name)))
-
+  
   (: parse-object (Sxml -> Key))
   (define (parse-object sxml)
     (define sx-key (select-single-node-text "/s3:Key" nss))
@@ -96,21 +98,21 @@
     (define sx-size (select-single-node-text "/s3:Size" nss))
     ;;(define sx-storage (select-single-node-text "/s3:StorageClass" nss))
     (let ((key (sx-key sxml))
-	  (last-modified (sx-last-modified sxml))
-	  (etag (sx-etag sxml))
-	  (size (s->i (sx-size sxml)))
-	  ;;(storage (sx-storage sxml))
-	  (owner (parse-owner sxml)))
+          (last-modified (sx-last-modified sxml))
+          (etag (sx-etag sxml))
+          (size (s->i (sx-size sxml)))
+          ;;(storage (sx-storage sxml))
+          (owner (parse-owner sxml)))
       (Key key last-modified ;; storage 
-	      etag (assert size) owner)))
+           etag (assert size) owner)))
   
   (: parse-objects (Sxml -> (Listof Key)))
   (define (parse-objects sxml)
     (define sx-objects (sxpath "/s3:Contents" nss))
     (let ((objs (sx-objects sxml)))
       (if (andmap list? objs)
-	  (map parse-object objs)
-	  '())))
+          (map parse-object objs)
+          '())))
   
   (: parse-prefixes (Sxml -> (Listof Prefix)))
   (define (parse-prefixes sxml)
@@ -120,7 +122,7 @@
       (if (andmap list? pre-s)
           (map (λ: ((sxml : Sxml)) (Prefix (sx-prefix sxml))) pre-s)
           '())))
-      
+  
   (: parse-response (Sxml -> Keys))
   (define (parse-response sxml)
     (define sx-name (select-single-node-text "/s3:Name" nss))
@@ -136,9 +138,9 @@
           (objs (parse-objects sxml))
           (prefixes (parse-prefixes sxml)))
       (Keys name prefix marker (assert max-keys) is-truncated prefixes objs)))
-
+  
   (define sx-result (sxpath "s3:ListBucketResult" nss))
-      
+  
   (let ((query (make-headers `(("prefix" . ,prefix)
                                ("marker" . ,marker)
                                ("delimiter" . ,delimiter)
@@ -150,16 +152,16 @@
 (define (put-file-object in-file-path bucket path)
   (if (file-exists? in-file-path)
       (let* ((length (assert (file-size in-file-path) index?))
-	     (ip (open-input-file in-file-path))
-	     (mime "binary/octet-stream")
-	     (payload (HTTPPayload mime #f length ip)))
-	(with-handlers [(exn:fail? (lambda (ex)
-				     (close-input-port ip)
-				     (make-empty-error-response 500 (exn-message ex))))]
-	  (s3-invoke 'PUT bucket path #f '() payload)))
+             (ip (open-input-file in-file-path))
+             (mime "binary/octet-stream")
+             (payload (HTTPPayload mime #f length ip)))
+        (with-handlers [(exn:fail? (lambda (ex)
+                                     (close-input-port ip)
+                                     (make-empty-error-response 500 (exn-message ex))))]
+          (s3-invoke 'PUT bucket path #f '() payload)))
       (make-empty-error-response 404 (string-append "File " 
-						    in-file-path 
-						    " does not exist to PUT"))))
+                                                    in-file-path 
+                                                    " does not exist to PUT"))))
 
 (: put-object (Bytes String String -> S3Response))
 (define (put-object bytes bucket path)
@@ -177,24 +179,11 @@
 (define (head-object bucket path)
   (s3-invoke 'HEAD bucket path #f '() #f))
 
-(: get-object (String String -> S3Response))
+(: get-object (String String -> (U S3Response Bytes)))
 (define (get-object bucket path)
-  (s3-invoke 'GET bucket path #f '() #f))
+  (s3-get-object bucket path))
 
-;; (define (get-object credentials s3-resource)
-;;   (let* ((datetime (rfc2822-date))
-;;        (http-headers (list (date-header datetime)
-;; 			   (authorization-header credentials 
-;; 						 (aws-s3-auth-str "GET" "" "" datetime '() 
-;; 								  (s3-resource->string s3-resource))))))
-;;     (s3-response-from-port (s3-get (make-object-url s3-resource) http-headers))))
-
-;(define (head-object credentials s3-resource)
-;  (let* ((datetime (rfc2822-date))           
-;         (http-headers (list (date-header datetime)
-;                             (authorization-header credentials 
-;                                                   (aws-s3-auth-str "HEAD" "" "" datetime '() 
-;                                                                    (s3-resource->string s3-resource))))))
-;    (s3-response-from-port (s3-head (make-object-url s3-resource) http-headers))))
-
+(: get-object-to-file (String String Path -> S3Response))
+(define (get-object-to-file bucket path file-path)
+  (s3-get-object-pipe-to-file bucket path file-path))
 

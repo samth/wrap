@@ -5,10 +5,11 @@
  S3Response S3Response? S3Response-http S3Response-sxml
  empty-response make-empty-error-response
  make-base-uri
- s3-invoke)
+ s3-invoke s3-get-object s3-get-object-pipe-to-file)
 
 (require
- (only-in racket/port port->bytes)
+ (only-in racket/port 
+          port->bytes)
  (only-in "../../httpclient/uri.rkt"
           make-uri Uri Uri-path)
  (only-in "../../prelude/type/date.rkt"
@@ -31,10 +32,10 @@
           http-method->string http-status-code http-has-content?
           ResponseHeader-status StatusLine
           HTTPConnection-in HTTPConnection-header
-          http-invoke http-close-connection make-client-error-response)
+          http-invoke http-close-connection )         
  (only-in "../../format/xml/sxml.rkt"
-          Sxml SXPath 
-          sxpath xml->sxml select-single-node-text)
+          Sxml 
+          xml->sxml)
  (only-in "../credential.rkt"
           current-aws-credential
           AwsCredential
@@ -44,9 +45,7 @@
           aws-auth-str
           aws-auth-mac)
  (only-in "../configuration.rkt"
-          s3-host)
- (only-in "configuration.rkt"
-          s3-namespace nss))
+          s3-host))
 
 (struct: S3Response ([http : StatusLine]
                      [sxml : Sxml]) #:transparent)
@@ -158,6 +157,8 @@
                                 (string-append "Bad Request - Malformed URL"))
                     empty-response))))
 
+
+;; S3 RPC Req/Resp API invocation
 (: s3-invoke (Method (Option String) String (Option Params) Headers (Option HTTPPayload) -> S3Response))
 (define (s3-invoke action bucket path query-params headers payload)
   (let ((url (make-base-uri bucket path query-params)))
@@ -193,16 +194,19 @@
                                                                                 (exn-message ex)))
                                                      empty-response)))]
               
-              (if (and (http-has-content? connection) (not (eq? action 'HEAD)))
-                  (let ((results (xml->sxml (HTTPConnection-in connection) '())))
-                    (http-close-connection connection)
-                    (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-                                results))
-                  (begin0                                        
-                    (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-                                empty-response)
-                    (http-close-connection connection))))))
+              (if (http-has-content? connection)
+                  (cond                    
+                    ((eq? action 'HEAD)                                        
+                     (http-close-connection connection)
+                     (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+                                 empty-response))                     
+                    (else 
+                     (let ((results (xml->sxml (HTTPConnection-in connection) '())))
+                       (http-close-connection connection)
+                       (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+                                   results))))
+                  (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+                              empty-response)))))
         (S3Response (StatusLine 'HTTP/1.1 400 
                                 (string-append "Bad Request - Malformed URL"))
                     empty-response))))
-
