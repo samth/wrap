@@ -19,7 +19,7 @@
 #lang typed/racket/base
 
 (provide 
- get-object head-object
+ get-object get-object-to-file head-object
  list-bucket-objects
  put-object delete-object
  put-file-object)
