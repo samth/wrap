@@ -1,6 +1,7 @@
 #lang typed/racket/base
 
 (provide
+ EventType EventType?
  (struct-out HistoryEvent))
 
 (require
@@ -54,7 +55,9 @@
                           'RequestCancelExternalWorkflowExecutionFailed 
                           'ExternalWorkflowExecutionCancelRequested))
 
+(define-predicate EventType? EventType)
+
 (struct: HistoryEvent ([event-id : Integer]
-                       [timestamp : String]
+                       [timestamp : Real]
                        [event-type : EventType]
-                       [attributes : JsObject]))
+                       [attributes : JsObject]) #:transparent)

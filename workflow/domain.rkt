@@ -12,7 +12,7 @@
           Duration
           WFResponseCode)
  (only-in "attrs.rkt"
-          duration->string))
+          duration->attr))
 
 (define register-domain-target  "SimpleWorkflowService.RegisterDomain")
 (define deprecate-domain-target "SimpleWorkflowService.DeprecateDomain")
@@ -21,7 +21,7 @@
 
 (: register-domain (String String Duration -> WFResponseCode))
 (define (register-domain name desc retention-days)
-  (let ((sdays (duration->string retention-days)))                   
+  (let ((sdays (duration->attr retention-days)))                   
     (let: ((payload : JsObject (jsobject `((name . ,name)
                                            (description . ,desc)
                                            (workflowExecutionRetentionPeriodInDays . ,sdays)))))
