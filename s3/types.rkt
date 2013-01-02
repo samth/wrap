@@ -19,6 +19,7 @@
 #lang typed/racket/base
 
 (provide 
+ (struct-out Range)
  (struct-out Buckets)
  (struct-out Owner)
  (struct-out Bucket)
@@ -56,3 +57,5 @@
    [is-truncated : Boolean]
    [prefixes : (Listof Prefix)]
    [objects : (Listof Key)]) #:transparent)
+
+(struct: Range ([from : Natural] [to : Natural]))

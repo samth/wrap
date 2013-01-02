@@ -45,7 +45,9 @@
           aws-auth-str
           aws-auth-mac)
  (only-in "../configuration.rkt"
-          s3-host))
+          s3-host)
+ (only-in "types.rkt"
+          Range Range-from Range-to))
 
 (struct: S3Response ([http : StatusLine]
                      [sxml : Sxml]) #:transparent)
@@ -85,8 +87,14 @@
                                (aws-auth-mac (BaseCredential-secret-key credential)
                                              auth-str))))
 
-(: s3-get-object-pipe-to-file (String String Path -> S3Response))
-(define (s3-get-object-pipe-to-file bucket path file-path)
+(: range-header (Range -> Header))
+(define (range-header range)
+  (make-header "range" (format "bytes=~s-~s"
+                                (Range-from range)
+                                (Range-to range))))
+
+(: s3-get-object-pipe-to-file (String String Path (Option Range)-> S3Response))
+(define (s3-get-object-pipe-to-file bucket path file-path range)
   (define: buff-sz : Integer (* 10 1024))
   (define: zero : Integer 0)
   (let ((url (make-base-uri bucket path '())))
@@ -98,8 +106,9 @@
                                                           (aws-auth-str (http-method->string 'GET)
                                                                         "" ""
                                                                         datetime '()
-                                                                        canonical-resource)))))
-          (let ((connection (http-invoke 'GET url core-headers #f)))
+                                                                        canonical-resource))))
+               (headers (if range (cons (range-header range) core-headers) core-headers)))
+          (let ((connection (http-invoke 'GET url headers #f)))
             (with-handlers [(exn:fail? (λ (ex)
                                          ((error-display-handler) "ERROR in S3 Object GET" ex)
                                          (http-close-connection connection)
@@ -129,19 +138,20 @@
                                 (string-append "Bad Request - Malformed URL"))
                     empty-response))))
 
-(: s3-get-object (String String -> (U S3Response Bytes)))
-(define (s3-get-object bucket path)
+(: s3-get-object (String String (Option Range) -> (U S3Response Bytes)))
+(define (s3-get-object bucket path range)
   (let ((url (make-base-uri bucket path '())))
     (if url 
         (let* ((datetime (current-date-string-rfc-2822))
                (canonical-resource (string-append "/" bucket (Uri-path url)))
-               (core-headers  (list (make-header DATE datetime)
-                                    (authorization-header (current-aws-credential)
-                                                          (aws-auth-str (http-method->string 'GET)
-                                                                        "" ""
-                                                                        datetime '()
-                                                                        canonical-resource)))))
-          (let ((connection (http-invoke 'GET url core-headers #f)))
+               (core-headers (list (make-header DATE datetime)
+                                   (authorization-header (current-aws-credential)
+                                                         (aws-auth-str (http-method->string 'GET)
+                                                                       "" ""
+                                                                       datetime '()
+                                                                       canonical-resource))))
+               (headers (if range (cons (range-header range) core-headers) core-headers)))
+          (let ((connection (http-invoke 'GET url headers #f)))
             (with-handlers [(exn:fail? (λ (ex)
                                          ((error-display-handler) "ERROR in S3 Object GET" ex)
                                          (http-close-connection connection)

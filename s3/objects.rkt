@@ -19,10 +19,11 @@
 #lang typed/racket/base
 
 (provide 
- get-object get-object-to-file head-object
- list-bucket-objects
- put-object delete-object
- put-file-object)
+ Range
+ s3-get-object s3-get-object-to-file s3-head-object
+ s3-list-bucket-objects
+ s3-put-object s3-delete-object
+ s3-put-file-object)
 
 (require 
  (only-in "../../prelude/type/date.rkt"
@@ -57,19 +58,21 @@
  (only-in "../configuration.rkt"
           s3-host)
  (only-in "types.rkt" 
-          Prefix Owner Bucket Buckets Keys Key)
+          Range Prefix Owner Bucket Buckets Keys Key)
  (only-in "configuration.rkt"
           nss)
  (only-in "invoke.rkt"
           make-base-uri make-empty-error-response 
-          s3-invoke s3-get-object s3-get-object-pipe-to-file
+          s3-invoke 
+          [s3-get-object s3-get]
+          s3-get-object-pipe-to-file
           S3Response S3Response-sxml
           S3Payload))
 
 ;; FIXME Use opt-map to create the parameter query string
 
-(: list-bucket-objects (String String String String Integer -> Keys))
-(define (list-bucket-objects bucket prefix delimiter marker max)
+(: s3-list-bucket-objects (String String String String Integer -> Keys))
+(define (s3-list-bucket-objects bucket prefix delimiter marker max)
   
   (: s->i (String -> (Option Integer)))
   (define (s->i s)
@@ -148,8 +151,8 @@
     (let ((resp (s3-invoke 'GET bucket "" query '() #f)))
       (parse-response (sx-result (S3Response-sxml resp))))))
 
-(: put-file-object (String String String -> S3Response))
-(define (put-file-object in-file-path bucket path)
+(: s3-put-file-object (String String String -> S3Response))
+(define (s3-put-file-object in-file-path bucket path)
   (if (file-exists? in-file-path)
       (let* ((length (assert (file-size in-file-path) index?))
              (ip (open-input-file in-file-path))
@@ -163,27 +166,29 @@
                                                     in-file-path 
                                                     " does not exist to PUT"))))
 
-(: put-object (Bytes String String -> S3Response))
-(define (put-object bytes bucket path)
+(: s3-put-object (Bytes String String -> S3Response))
+(define (s3-put-object bytes bucket path)
   (let* ((length (bytes-length bytes))
          (md5 (base64-encode (md5-bytes bytes)))
          (mime "binary/octet-stream")
          (payload (HTTPPayload mime md5 length (open-input-bytes bytes))))
     (s3-invoke 'PUT bucket path #f '() payload)))
 
-(: delete-object (String String -> S3Response))
-(define (delete-object bucket path)
+(: s3-delete-object (String String -> S3Response))
+(define (s3-delete-object bucket path)
   (s3-invoke 'DELETE bucket path #f '() #f))
 
-(: head-object (String String -> S3Response))
-(define (head-object bucket path)
+(: s3-head-object (String String -> S3Response))
+(define (s3-head-object bucket path)
   (s3-invoke 'HEAD bucket path #f '() #f))
 
-(: get-object (String String -> (U S3Response Bytes)))
-(define (get-object bucket path)
-  (s3-get-object bucket path))
+(: s3-get-object (case-> (String String -> (U S3Response Bytes))
+                         (String String (Option Range) -> (U S3Response Bytes))))
+(define (s3-get-object bucket path [range #f])
+  (s3-get bucket path range))
 
-(: get-object-to-file (String String Path -> S3Response))
-(define (get-object-to-file bucket path file-path)
-  (s3-get-object-pipe-to-file bucket path file-path))
+(: s3-get-object-to-file (case-> (String String Path -> S3Response)
+                                 (String String Path (Option Range) -> S3Response)))
+(define (s3-get-object-to-file bucket path file-path [range #f])
+  (s3-get-object-pipe-to-file bucket path file-path range))
 
