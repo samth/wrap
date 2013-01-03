@@ -151,19 +151,19 @@
     (let ((resp (s3-invoke 'GET bucket "" query '() #f)))
       (parse-response (sx-result (S3Response-sxml resp))))))
 
-(: s3-put-file-object (String String String -> S3Response))
-(define (s3-put-file-object in-file-path bucket path)
-  (if (file-exists? in-file-path)
-      (let* ((length (assert (file-size in-file-path) index?))
-             (ip (open-input-file in-file-path))
+(: s3-put-file-object (Path String String -> S3Response))
+(define (s3-put-file-object local-file-path bucket s3-path)
+  (if (file-exists? local-file-path)
+      (let* ((length (assert (file-size local-file-path) index?))
+             (ip (open-input-file local-file-path))
              (mime "binary/octet-stream")
              (payload (HTTPPayload mime #f length ip)))
         (with-handlers [(exn:fail? (lambda (ex)
                                      (close-input-port ip)
                                      (make-empty-error-response 500 (exn-message ex))))]
-          (s3-invoke 'PUT bucket path #f '() payload)))
+          (s3-invoke 'PUT bucket s3-path #f '() payload)))
       (make-empty-error-response 404 (string-append "File " 
-                                                    in-file-path 
+                                                    (path->string local-file-path)
                                                     " does not exist to PUT"))))
 
 (: s3-put-object (Bytes String String -> S3Response))
