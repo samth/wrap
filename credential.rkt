@@ -57,10 +57,9 @@
                                        [associate-tag : String]
                                        [session       : (Option SessionCredential)]) #:mutable #:transparent)
 
-;; struct-copy is broken in TR
 (: add-session-credential (SessionCredential -> AwsCredential))
 (define (add-session-credential session-cred)
-  (struct-copy AwsCredential (current-aws-credential) [session session-cred])) ;; BROKEN IN TypedRacket.
+  (struct-copy AwsCredential (current-aws-credential) [session session-cred]))
 
 (: default-cred-path Path)
 (define default-cred-path

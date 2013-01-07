@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Knozama's Amazon API Library
-;; Copyright (C) 2007-2011  Raymond Paul Racine
+;; Ray Racine's Amazon API Library
+;; Copyright (C) 2007-2013  Raymond Paul Racine
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
