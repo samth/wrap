@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Knozama's Amazon API Library
+;; Knozama's AWS API Library
 ;; Copyright (C) 2007-2011  Raymond Paul Racine
 ;;
 ;; This program is free software: you can redistribute it and/or modify
@@ -21,9 +21,11 @@
 (provide 
  Range
  s3-get-object s3-get-object-to-file s3-head-object
- s3-list-bucket-objects
  s3-put-object s3-delete-object
  s3-put-file-object)
+
+(provide:
+ [s3-list-bucket-objects (String String String String Natural -> Keys)])
 
 (require 
  (only-in "../../prelude/type/date.rkt"
@@ -71,7 +73,7 @@
 
 ;; FIXME Use opt-map to create the parameter query string
 
-(: s3-list-bucket-objects (String String String String Integer -> Keys))
+(: s3-list-bucket-objects (String String String String Natural -> Keys))
 (define (s3-list-bucket-objects bucket prefix delimiter marker max)
   
   (: s->i (String -> (Option Integer)))

@@ -54,7 +54,7 @@
    [prefix : String]
    [marker : String]
    [max-keys : Integer]
-   [is-truncated : Boolean]
+   [truncated? : Boolean]
    [prefixes : (Listof Prefix)]
    [objects : (Listof Key)]) #:transparent)
 

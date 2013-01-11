@@ -1,3 +1,21 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ray Racine's AWS API Library
+;; Copyright (C) 2007-2013  Raymond Paul Racine
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 #lang typed/racket/base
 
 (provide 
@@ -90,8 +108,8 @@
 (: range-header (Range -> Header))
 (define (range-header range)
   (make-header "range" (format "bytes=~s-~s"
-                                (Range-from range)
-                                (Range-to range))))
+			       (Range-from range)
+			       (Range-to range))))
 
 (: s3-get-object-pipe-to-file (String String Path (Option Range)-> S3Response))
 (define (s3-get-object-pipe-to-file bucket path file-path range)
@@ -110,25 +128,25 @@
                (headers (if range (cons (range-header range) core-headers) core-headers)))
           (let ((connection (http-invoke 'GET url headers #f)))
             (with-handlers [(exn:fail? (λ (ex)
-                                         ((error-display-handler) "ERROR in S3 Object GET" ex)
-                                         (http-close-connection connection)
-                                         (S3Response (StatusLine 'HTTP/1.1 500
-                                                                 (exn-message ex))
-                                                     empty-response)))]
+					  ((error-display-handler) "ERROR in S3 Object GET" ex)
+					  (http-close-connection connection)
+					  (S3Response (StatusLine 'HTTP/1.1 500
+								  (exn-message ex))
+						      empty-response)))]
               (if (http-has-content? connection)
                   (call-with-output-file
                       file-path 
                     (λ: ((outp : Output-Port))
-                      (let* ((inp (HTTPConnection-in connection))                            
-                             (buffer (make-bytes buff-sz)))
-                        (let: loop : S3Response ((bs : (U EOF Integer) (read-bytes! buffer inp)))
-                          (if (eof-object? bs)
-                              (begin
-                                (http-close-connection connection)
-                                (S3Response (StatusLine 'HTTP/1.1 200 "OK") empty-response))
-                              (begin
-                                (write-bytes buffer outp zero bs)
-                                (loop (read-bytes! buffer inp)))))))
+			(let* ((inp (HTTPConnection-in connection))                            
+			       (buffer (make-bytes buff-sz)))
+			  (let: loop : S3Response ((bs : (U EOF Integer) (read-bytes! buffer inp)))
+				(if (eof-object? bs)
+				    (begin
+				      (http-close-connection connection)
+				      (S3Response (StatusLine 'HTTP/1.1 200 "OK") empty-response))
+				    (begin
+				      (write-bytes buffer outp zero bs)
+				      (loop (read-bytes! buffer inp)))))))
                     #:mode 'binary
                     #:exists 'error)
                   (S3Response (StatusLine 'HTTP/1.1 500
@@ -153,11 +171,11 @@
                (headers (if range (cons (range-header range) core-headers) core-headers)))
           (let ((connection (http-invoke 'GET url headers #f)))
             (with-handlers [(exn:fail? (λ (ex)
-                                         ((error-display-handler) "ERROR in S3 Object GET" ex)
-                                         (http-close-connection connection)
-                                         (S3Response (StatusLine 'HTTP/1.1 500
-                                                                 (exn-message ex))
-                                                     empty-response)))]
+					  ((error-display-handler) "ERROR in S3 Object GET" ex)
+					  (http-close-connection connection)
+					  (S3Response (StatusLine 'HTTP/1.1 500
+								  (exn-message ex))
+						      empty-response)))]
               (if (http-has-content? connection)
                   (let ((bytes (port->bytes (HTTPConnection-in connection))))
                     (http-close-connection connection)
@@ -206,15 +224,15 @@
               
               (if (http-has-content? connection)
                   (cond                    
-                    ((eq? action 'HEAD)                                        
-                     (http-close-connection connection)
-                     (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-                                 empty-response))                     
-                    (else 
-                     (let ((results (xml->sxml (HTTPConnection-in connection) '())))
-                       (http-close-connection connection)
-                       (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-                                   results))))
+		   ((eq? action 'HEAD)                                        
+		    (http-close-connection connection)
+		    (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+				empty-response))                     
+		   (else 
+		    (let ((results (xml->sxml (HTTPConnection-in connection) '())))
+		      (http-close-connection connection)
+		      (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+				  results))))
                   (S3Response (ResponseHeader-status (HTTPConnection-header connection))
                               empty-response)))))
         (S3Response (StatusLine 'HTTP/1.1 400 
