@@ -1,6 +1,7 @@
 #lang typed/racket/base
 
 (provide
+ DecisionTask
  poll-for-decision-task
  poll-for-activity-task)
 
@@ -63,7 +64,7 @@
         #f
         (ActivityTask "id" (ActivityType "name" "ver") 
                       "inputkadfafadf"  started-event-id "token" 
-                      (WorkflowExecution "run-id" "wf-id")))))
+                      (WorkflowExecution "wf-id" "run-id")))))
 
 ;; AWS long polls, so a call will "hang" for 60 secs prior to returning.
 (: poll-for-activity-task (String (Option String) String -> TaskList))
@@ -117,14 +118,10 @@
 ;- : (U False DecisionTask)
 ;(DecisionTask '() "" 0 0 "" #<WorkflowExecution> #<WorkflowType>)
 
-
-
 ;; Decision Task API
 
 (: parse-decision-task-response (JsObject -> (Option DecisionTask)))
 (define (parse-decision-task-response jsobj)
-  
-  (pretty-print jsobj)
   (if (no-available-activity jsobj)
       #f
       (DecisionTask (attr-value-string jsobj 'taskToken)

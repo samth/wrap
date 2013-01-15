@@ -21,8 +21,8 @@
   (U 'Success 
      'DomainAlreadyExists 'LimitExceeded 'OperationNotPermitted))
 
-(struct: WorkflowExecution ([run-id : String]
-                            [workflow-id : String]) #:transparent)
+(struct: WorkflowExecution ([workflow-id : String]
+			    [run-id : String]) #:transparent)
 
 (struct: VersionedType ([name : String]
                         [version : String]) #:transparent)

@@ -1,10 +1,11 @@
 #lang typed/racket/base
 
 (provide
- start-workflow-execution)
+ start-workflow-execution
+ terminate-workflow-execution)
 
 (require
- ;;racket/pretty
+ racket/pretty
  (only-in prelude/std/opt
           opt-map)
  (only-in httpclient/uri/guid
@@ -12,6 +13,7 @@
  (only-in format/json/tjson
           JsObject jsobject jsobject-opt) 
  (only-in "types.rkt"
+	  WorkflowExecution
           VersionedType-name VersionedType-version
           WorkflowType ChildPolicy Duration)
  (only-in "attrs.rkt"
@@ -43,15 +45,13 @@
     (workflow register-workflow-target payload)
     (void)))
 
-(struct: Run ([run-id : String]) #:transparent)
-
 #| Start a Workflow execution |#
 
 (define start-workflow-execution-target "SimpleWorkflowService.StartWorkflowExecution")
 
-(: parse-start-workflow-execution-response (JsObject -> Run))
-(define (parse-start-workflow-execution-response jsobj)
-  (Run (attr-value-string jsobj 'runId)))
+(: parse-start-workflow-execution-response (String JsObject -> WorkflowExecution))
+(define (parse-start-workflow-execution-response wid jsobj)
+  (WorkflowExecution wid (attr-value-string jsobj 'runId)))
 
 (: start-workflow-execution (String WorkflowType 
                                     [#:id String]
@@ -60,7 +60,7 @@
                                     [#:task-timeout (Option Integer)]
                                     [#:input String]
                                     [#:tags (Listof String)]
-                                    [#:queue String] -> Run))
+                                    [#:queue String] -> WorkflowExecution))
 (define (start-workflow-execution domain workflow-type
                                   #:id [id (guid)]
                                   #:policy [child-policy #f] 
@@ -69,17 +69,17 @@
                                   #:input [input ""] 
                                   #:tags [tag-list '()]
                                   #:queue [task-queue ""])
-  (parse-start-workflow-execution-response  (workflow start-workflow-execution-target 
-                                                      (jsobject-opt `((domain . ,domain)
-                                                                      (workflowId . ,id)
-                                                                      (workflowType . ,(jsobject `((name . ,(VersionedType-name workflow-type))
-                                                                                                   (version . ,(VersionedType-version workflow-type)))))
-                                                                      (childPolicy . ,(policy->attr child-policy))
-                                                                      (executionStartToCloseTimeout . ,execution-timeout)
-                                                                      (taskStartToCloseTimeout . ,task-timeout)
-                                                                      (tagList . ,tag-list)
-                                                                      (input . ,input)
-                                                                      (taskList . ,(queue->jsobject task-queue)))))))
+  (parse-start-workflow-execution-response id  (workflow start-workflow-execution-target 
+							 (jsobject-opt `((domain . ,domain)
+									 (workflowId . ,id)
+									 (workflowType . ,(jsobject `((name . ,(VersionedType-name workflow-type))
+												      (version . ,(VersionedType-version workflow-type)))))
+									 (childPolicy . ,(policy->attr child-policy))
+									 (executionStartToCloseTimeout . ,execution-timeout)
+									 (taskStartToCloseTimeout . ,task-timeout)
+									 (tagList . ,tag-list)
+									 (input . ,input)
+									 (taskList . ,(queue->jsobject task-queue)))))))
 
 #| Terminate a Workflow, a hard kill |#
 
@@ -95,6 +95,8 @@
                                       #:policy [child-policy #f]
                                       #:details [details ""]
                                       #:reason [reason ""])
+  (pretty-print workflow-id)
+  (pretty-print run-id)
   (workflow terminate-workflow-execution-target
             (jsobject-opt `((domain . ,domain)
                             (workflowId . ,workflow-id)

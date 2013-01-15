@@ -77,5 +77,5 @@
 
 (: parse-workflow-execution (JsObject -> WorkflowExecution))
 (define (parse-workflow-execution jsobj)
-  (WorkflowExecution (attr-value-string jsobj 'runId)
-                     (attr-value-string jsobj 'workflowId)))
+  (WorkflowExecution (attr-value-string jsobj 'workflowId) (attr-value-string jsobj 'runId)))
+                     
