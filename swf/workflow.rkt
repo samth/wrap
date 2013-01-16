@@ -54,13 +54,13 @@
   (WorkflowExecution wid (attr-value-string jsobj 'runId)))
 
 (: start-workflow-execution (String WorkflowType 
-                                    [#:id String]
-                                    [#:policy (Option ChildPolicy)]
-                                    [#:execution-timeout (Option Integer)]
-                                    [#:task-timeout (Option Integer)]
-                                    [#:input String]
-                                    [#:tags (Listof String)]
-                                    [#:queue String] -> WorkflowExecution))
+				    [#:id String]
+				    [#:policy (Option ChildPolicy)]
+				    [#:execution-timeout (Option Natural)]
+				    [#:task-timeout (Option Natural)]
+				    [#:input String]
+				    [#:tags (Listof String)]
+				    [#:queue String] -> WorkflowExecution))
 (define (start-workflow-execution domain workflow-type
                                   #:id [id (guid)]
                                   #:policy [child-policy #f] 
@@ -75,8 +75,8 @@
 									 (workflowType . ,(jsobject `((name . ,(VersionedType-name workflow-type))
 												      (version . ,(VersionedType-version workflow-type)))))
 									 (childPolicy . ,(policy->attr child-policy))
-									 (executionStartToCloseTimeout . ,execution-timeout)
-									 (taskStartToCloseTimeout . ,task-timeout)
+									 (executionStartToCloseTimeout . ,(opt-map execution-timeout number->string))
+									 (taskStartToCloseTimeout . ,(opt-map task-timeout number->string))
 									 (tagList . ,tag-list)
 									 (input . ,input)
 									 (taskList . ,(queue->jsobject task-queue)))))))
