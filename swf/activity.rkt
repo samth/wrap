@@ -1,7 +1,8 @@
 #lang typed/racket/base
 
 (provide
- DecisionTask
+ (struct-out DecisionTask)
+ (struct-out ActivityTask)
  poll-for-decision-task
  poll-for-activity-task)
 
@@ -42,7 +43,7 @@
 (struct: DecisionTask ([task-token : String]
                        [events : (Listof HistoryEvent)]
                        [next-page-token : (Option String)]
-                       [started-event-id : Integer]                       
+                       [started-event-id : Integer]                      
                        [previous-started-event-id : Integer]                       
                        [workflow-execution : WorkflowExecution]
                        [workflow-type : WorkflowType]) #:transparent)
@@ -76,47 +77,47 @@
     (json->string (workflow poll-for-activity-target payload))))
 
 
-;'#hasheq((previousStartedEventId . 0)
-;         (events
-;          .
-;          (#hasheq((eventId . 1)
-;                   (workflowExecutionStartedEventAttributes
-;                    .
-;                    #hasheq((input . "my input data here")
-;                            (taskList . #hasheq((name . "mr-master")))
-;                            (parentInitiatedEventId . 0)
-;                            (taskStartToCloseTimeout . "1200")
-;                            (executionStartToCloseTimeout . "7200")
-;                            (childPolicy . "TERMINATE")
-;                            (workflowType
-;                             .
-;                             #hasheq((name . "mapreduce") (version . "1.0")))))
-;                   (eventType . "WorkflowExecutionStarted")
-;                   (eventTimestamp . 1.3569767483749))
-;           #hasheq((eventId . 2)
-;                   (decisionTaskScheduledEventAttributes
-;                    .
-;                    #hasheq((taskList . #hasheq((name . "mr-master")))
-;                            (startToCloseTimeout . "1200")))
-;                   (eventType . "DecisionTaskScheduled")
-;                   (eventTimestamp . 1.3569767483749))
-;           #hasheq((eventId . 3)
-;                   (decisionTaskStartedEventAttributes
-;                    .
-;                    #hasheq((scheduledEventId . 2)))
-;                   (eventType . "DecisionTaskStarted")
-;                   (eventTimestamp . 1.35697734219))))
-;         (workflowType . #hasheq((name . "mapreduce") (version . "1.0")))
-;         (startedEventId . 3)
-;         (workflowExecution
-;          .
-;          #hasheq((runId . "11KxU8+9lE8BB+7F2FMTAfwBOb+LxeEtjG2gQBf9YEl2U=")
-;                  (workflowId . "9420161c-4f32-112d-9b8b-0090f5ccb571")))
-;         (taskToken
-;          .
-;          "AAAAKgAAAAEAAAAAAAAAAbhOa7pTSREnSf3IsydwCMC/k3Nhx1H2RXEiA8TwMobm7isRaNtiVMNUgjhNqBd4xtb2TloC5jaQIovzOpRnNRWFC6ZgPtGvJVyG4Cvq2rpNlAEfevRNGEwEHhc4dxmqsh+2dNaoL6Pio0rA6Ud3JX7K8JHOnAxxiEDptqbEMmqQD48W002ZCV4dIIdW9Jehaq72aAELQKsGEIoc+6BaetFI3ps2zzU7yjQCyIni2klAotT387fEPw6ArPcmUWh8qowsc/yVZDmH01oP6FqZecpYF9KGlTy+wBS2qq8sCqg9IZaRMdmXJuphRv7gpkcClw=="))
-;- : (U False DecisionTask)
-;(DecisionTask '() "" 0 0 "" #<WorkflowExecution> #<WorkflowType>)
+					;'#hasheq((previousStartedEventId . 0)
+					;         (events
+					;          .
+					;          (#hasheq((eventId . 1)
+					;                   (workflowExecutionStartedEventAttributes
+					;                    .
+					;                    #hasheq((input . "my input data here")
+					;                            (taskList . #hasheq((name . "mr-master")))
+					;                            (parentInitiatedEventId . 0)
+					;                            (taskStartToCloseTimeout . "1200")
+					;                            (executionStartToCloseTimeout . "7200")
+					;                            (childPolicy . "TERMINATE")
+					;                            (workflowType
+					;                             .
+					;                             #hasheq((name . "mapreduce") (version . "1.0")))))
+					;                   (eventType . "WorkflowExecutionStarted")
+					;                   (eventTimestamp . 1.3569767483749))
+					;           #hasheq((eventId . 2)
+					;                   (decisionTaskScheduledEventAttributes
+					;                    .
+					;                    #hasheq((taskList . #hasheq((name . "mr-master")))
+					;                            (startToCloseTimeout . "1200")))
+					;                   (eventType . "DecisionTaskScheduled")
+					;                   (eventTimestamp . 1.3569767483749))
+					;           #hasheq((eventId . 3)
+					;                   (decisionTaskStartedEventAttributes
+					;                    .
+					;                    #hasheq((scheduledEventId . 2)))
+					;                   (eventType . "DecisionTaskStarted")
+					;                   (eventTimestamp . 1.35697734219))))
+					;         (workflowType . #hasheq((name . "mapreduce") (version . "1.0")))
+					;         (startedEventId . 3)
+					;         (workflowExecution
+					;          .
+					;          #hasheq((runId . "11KxU8+9lE8BB+7F2FMTAfwBOb+LxeEtjG2gQBf9YEl2U=")
+					;                  (workflowId . "9420161c-4f32-112d-9b8b-0090f5ccb571")))
+					;         (taskToken
+					;          .
+					;          "AAAAKgAAAAEAAAAAAAAAAbhOa7pTSREnSf3IsydwCMC/k3Nhx1H2RXEiA8TwMobm7isRaNtiVMNUgjhNqBd4xtb2TloC5jaQIovzOpRnNRWFC6ZgPtGvJVyG4Cvq2rpNlAEfevRNGEwEHhc4dxmqsh+2dNaoL6Pio0rA6Ud3JX7K8JHOnAxxiEDptqbEMmqQD48W002ZCV4dIIdW9Jehaq72aAELQKsGEIoc+6BaetFI3ps2zzU7yjQCyIni2klAotT387fEPw6ArPcmUWh8qowsc/yVZDmH01oP6FqZecpYF9KGlTy+wBS2qq8sCqg9IZaRMdmXJuphRv7gpkcClw=="))
+					;- : (U False DecisionTask)
+					;(DecisionTask '() "" 0 0 "" #<WorkflowExecution> #<WorkflowType>)
 
 ;; Decision Task API
 
