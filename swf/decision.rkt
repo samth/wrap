@@ -1,12 +1,17 @@
 #lang typed/racket/base
 
 (provide:
+[fail-workflow-execution-decision (case-> (-> JsObject)
+					  (String String -> JsObject))]
+ [respond-decision-task-completed (String String (Listof JsObject) -> Void)]
  [signal-external-workflow-execution-decision SignalExternalWorkflowExecutionDecisionFn]
  [continue-as-new-workflow-decision ContinueAsNewWorkflowDecisionFn]
  [schedule-activity-task-decision ScheduleActivityTaskDecisionFn])
 
 (require 
  ;;racket/pretty
+ (only-in prelude/std/opt
+          opt-map)
  (only-in httpclient/uri/guid
           guid)
  (only-in format/json/tjson
@@ -54,7 +59,7 @@
 
 (define respond-decision-task-completed-target "SimpleWorkflowService.RespondDecisionTaskCompleted")
 
-;(define-type DecisionAck (U 'Ack 'Nack))
+;;(define-type DecisionAck (U 'Ack 'Nack))
 
 (: respond-decision-task-completed (String String (Listof JsObject) -> Void))
 (define (respond-decision-task-completed task-token context decisions)  
@@ -63,7 +68,7 @@
                                                                (decisions . ,decisions))))
   (void))
 
-;ScheduleActivityTask schedules an activity task.
+;; ScheduleActivityTask schedules an activity task.
 (: schedule-activity-task-decision ScheduleActivityTaskDecisionFn)
 (define (schedule-activity-task-decision activity-type 
                                          #:id [id (guid)] 
@@ -80,17 +85,17 @@
                                 (activityId . ,id)
                                 (heartbeatTimeout . ,heartbeat-timeout)
                                 (control . ,control)
-                                (scheduleToStartTimeout . ,schedule-to-start-timeout)
-                                (scheduleToCloseTimeout . ,schedule-to-close-timeout)
-                                (startToCloseTimeot . ,start-to-close-timeout)
+                                (scheduleToStartTimeout . ,(opt-map schedule-to-start-timeout number->string))
+                                (scheduleToCloseTimeout . ,(opt-map schedule-to-close-timeout number->string))
+                                (startToCloseTimeot . ,(opt-map start-to-close-timeout number->string))
                                 (taskList . ,(jsobject-opt `((name . ,task-list)))))))
   (jsobject-opt `((decisionType . "ScheduleActivityTask")
                   (scheduleActivityTaskDecisionAttributes . ,attrs))))                                         
 
 #| RequestCancelActivityTask attempts to cancel a previously scheduled activity task. 
-   If the activity task was scheduled but has not been assigned to a worker, then it will be canceled. 
-   If the activity task was already assigned to a worker, then the worker will be informed
-   that cancellation has been requested in the response to RecordActivityTaskHeartbeat. |#
+If the activity task was scheduled but has not been assigned to a worker, then it will be canceled. 
+If the activity task was already assigned to a worker, then the worker will be informed
+that cancellation has been requested in the response to RecordActivityTaskHeartbeat. |#
 (: request-cancel-activity-task-decision (case-> (-> JsObject)
                                                  (String -> JsObject)))
 (define (request-cancel-activity-task-decision [activity-id (guid)])
@@ -98,8 +103,8 @@
               (requestCancelActivityTaskDecisionAttributes . ,(jsobject `((activityId . ,activity-id)))))))
 
 #| RecordMarker records a MarkerRecorded event in the history. 
-   Markers can be used for adding custom information in the history for instance 
-   to let deciders know that they do not need to look at the history beyond the marker event. |#
+Markers can be used for adding custom information in the history for instance 
+to let deciders know that they do not need to look at the history beyond the marker event. |#
 (: record-marker-decision (case-> (String -> JsObject)
                                   (String String -> JsObject)))
 (define (record-marker-decision name [details ""])
@@ -108,7 +113,7 @@
                                                                  (details . ,details)))))))
 
 #| CompleteWorkflowExecution closes the workflow execution 
-   and records a WorkflowExecutionCompleted event in the history. |#
+and records a WorkflowExecutionCompleted event in the history. |#
 (: complete-workflow-execution-decision (case-> (-> JsObject)
                                                 (String -> JsObject)))
 (define (complete-workflow-execution-decision [result ""])
@@ -117,7 +122,7 @@
 
 
 #| FailWorkflowExecution closes the workflow execution 
-   and records a WorkflowExecutionFailed event in the history. |#
+and records a WorkflowExecutionFailed event in the history. |#
 (: fail-workflow-execution-decision (case-> (-> JsObject)
                                             (String String -> JsObject)))
 (define (fail-workflow-execution-decision [reason ""] [details ""])
@@ -133,7 +138,8 @@
   (jsobject-opt `((decisionType . "CancelWorkflowExecution")
                   (cancelWorkflowExecutionDecisionAttributes . ,(jsobject-opt `((details . ,details)))))))
 
-;StartTimer starts a timer for this workflow execution and records a TimerStarted event in the history. This timer will fire after the specified delay and record a TimerFired event.
+#| StartTimer starts a timer for this workflow execution and records a TimerStarted event in the history. 
+This timer will fire after the specified delay and record a TimerFired event. |#
 (: start-timer-decision (case-> (String Natural -> JsObject)
                                 (String Natural String -> JsObject)))
 (define (start-timer-decision id duration [control ""])
@@ -142,15 +148,15 @@
                                                                (startToFireTimeout . ,duration)
                                                                (control . ,control)))))))
 
-;CancelTimer cancels a previously started timer and records a TimerCanceled event in the history.
+#| CancelTimer cancels a previously started timer and records a TimerCanceled event in the history. |#
 (: cancel-timer-decision (String -> JsObject))
 (define (cancel-timer-decision id)
   (jsobject `((decisionType . "CancelTimer")
               (cancelTimerDecisionAttributes . ,(jsobject `((timerId . ,id)))))))
 
 #| ContinueAsNewWorkflowExecution closes the workflow execution 
-   and starts a new workflow execution of the same type using the same workflow id 
-   and a unique run Id. A WorkflowExecutionContinuedAsNew event is recorded in the history. |#
+and starts a new workflow execution of the same type using the same workflow id 
+and a unique run Id. A WorkflowExecutionContinuedAsNew event is recorded in the history. |#
 (: continue-as-new-workflow-decision ContinueAsNewWorkflowDecisionFn)                                       
 (define (continue-as-new-workflow-decision #:version [version ""]
                                            #:child-policy [policy #f]
@@ -170,8 +176,8 @@
                   (continueAsNewWorkflowDecisionAttributes . ,attrs))))
 
 #| SignalExternalWorkflowExecution requests a signal to be delivered 
-   to the specified external workflow execution and records
-   a SignalExternalWorkflowExecutionInitiated event in the history. |#
+to the specified external workflow execution and records
+a SignalExternalWorkflowExecutionInitiated event in the history. |#
 (: signal-external-workflow-execution-decision SignalExternalWorkflowExecutionDecisionFn)
 (define (signal-external-workflow-execution-decision workflow-id signal-name [control ""] [input ""] [run-id ""])
   (define attrs (jsobject-opt `((workflowId . ,workflow-id)
@@ -183,8 +189,8 @@
               (signalExternalWorkflowExecutionDecisionAttributes . ,attrs))))
 
 #| RequestCancelExternalWorkflowExecution requests that a request be made to cancel 
-   the specified external workflow execution and records 
-   a RequestCancelExternalWorkflowExecutionInitiated event in the history. |#
+the specified external workflow execution and records 
+a RequestCancelExternalWorkflowExecutionInitiated event in the history. |#
 (: request-cancel-external-workflow-execution-decision (String [#:run-id String] [#:control String] -> JsObject))
 (define (request-cancel-external-workflow-execution-decision workflow-id #:run-id [run-id ""] #:control [control ""])
   (define attrs (jsobject-opt `((runId . ,run-id)
@@ -193,8 +199,8 @@
                   (requestCancelExternalWorkflowExecutionDecisionAttributes . ,attrs))))
 
 #| StartChildWorkflowExecution requests that a child workflow execution be started 
-   and records a StartChildWorkflowExecutionInitiated event in the history. 
-   The child workflow execution is a separate workflow execution with its own history. |#
+and records a StartChildWorkflowExecutionInitiated event in the history. 
+The child workflow execution is a separate workflow execution with its own history. |#
 (: start-child-workflow-execution-decision StartChildWorkflowExecutionDecisionFn)
 (define (start-child-workflow-execution-decision workflow-id workflow-type
                                                  #:child-policy [policy #f] 
