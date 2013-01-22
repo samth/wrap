@@ -41,10 +41,9 @@
  (only-in "attrs.rkt"
           parse-workflow-type
           parse-workflow-execution)
- (only-in "history/historyevent.rkt"
-          HistoryEvent)
-(only-in "history/history.rkt"
-	 parse-history-events)
+ (only-in "history.rkt"
+          HistoryEvent
+	  parse-history-events)
  (only-in "../dynamodb/parse.rkt"          
           attr-value-jsobject attr-value-jslist
           attr-value-integer attr-value-integer-opt

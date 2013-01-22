@@ -41,9 +41,6 @@
  (only-in "types.rkt"
           WorkflowExecution
           WorkflowType ChildPolicy Duration))
-; (only-in "historyevent.rkt"
-;          EventType EventType?
-;          HistoryEvent))
 
 #| Serialization helpers for API calls |#
 
