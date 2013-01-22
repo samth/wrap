@@ -1,12 +1,32 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ray Racine's Amazon API Library
+;; Copyright (C) 2007-2013  Raymond Paul Racine
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#| Parse routines for common message simple and complex types. |#
+
 #lang typed/racket/base
 
 (provide:
+ [parse-workflow-type (JsObject -> WorkflowType)]
+ [parse-workflow-execution (JsObject -> WorkflowExecution)]
+ [parse-workflow-type (JsObject -> WorkflowType)]
  [queue->jsobject ((Option String) -> Json)] 
  [policy->attr ((Option ChildPolicy) -> (Option String))]
- [duration->attr ((Option Duration) -> (Option String))]
- [parse-history-events (JsList -> (Listof HistoryEvent))]
- [parse-workflow-type (JsObject -> WorkflowType)]
- [parse-workflow-execution (JsObject -> WorkflowExecution)])
+ [duration->attr ((Option Duration) -> (Option String))])
 
 (require
  (only-in prelude/std/opt
@@ -20,10 +40,10 @@
           attr-value-jsobject)
  (only-in "types.rkt"
           WorkflowExecution
-          WorkflowType ChildPolicy Duration)
- (only-in "historyevent.rkt"
-          EventType EventType?
-          HistoryEvent))
+          WorkflowType ChildPolicy Duration))
+; (only-in "historyevent.rkt"
+;          EventType EventType?
+;          HistoryEvent))
 
 #| Serialization helpers for API calls |#
 
@@ -49,33 +69,7 @@
   (WorkflowType (attr-value-string jsobj 'name)
                 (attr-value-string jsobj 'version)))
 
-
-(: parse-history-event-attributes (Symbol JsObject -> JsObject))
-(define (parse-history-event-attributes event-type jsobj)
-  
-  (: build-stupid-attribute-name (-> Symbol))
-  (define (build-stupid-attribute-name)
-    (let ((event-type (symbol->string event-type)))
-      (string->symbol (string-append (string-downcase (substring event-type 0 1))
-                                     (substring event-type 1)
-                                     "EventAttributes"))))
-  
-  (attr-value-jsobject jsobj (build-stupid-attribute-name)))
-
-
-(: parse-history-event (JsObject -> HistoryEvent))
-(define (parse-history-event jsobj)  
-  (let ((event-type (string->symbol (attr-value-string jsobj 'eventType))))
-    (HistoryEvent (attr-value-integer jsobj 'eventId)
-                  (attr-value-real jsobj 'eventTimestamp)
-                  (assert event-type EventType?)
-                  (parse-history-event-attributes event-type jsobj))))
-
-(: parse-history-events (JsList -> (Listof HistoryEvent)))
-(define (parse-history-events events)
-  (map parse-history-event (cast events (Listof JsObject))))
-
 (: parse-workflow-execution (JsObject -> WorkflowExecution))
 (define (parse-workflow-execution jsobj)
   (WorkflowExecution (attr-value-string jsobj 'workflowId) (attr-value-string jsobj 'runId)))
-                     
+
