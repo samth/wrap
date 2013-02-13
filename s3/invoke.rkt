@@ -208,7 +208,6 @@
                                                                         md5 mime
                                                                         datetime '()
                                                                         canonical-resource)))))
-          ;;(pretty-print url)
           (let ((connection (http-invoke action 
                                          url 
                                          (append core-headers headers)

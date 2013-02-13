@@ -20,7 +20,7 @@
 
 (provide 
  Range
- s3-get-object s3-get-object-to-file s3-head-object
+ s3-get-object s3-get-object-to-file s3-head-object s3-object-meta
  s3-put-object s3-delete-object
  s3-put-file-object)
 
@@ -28,6 +28,12 @@
  [s3-list-bucket-objects (String String String String Natural -> Keys)])
 
 (require 
+ racket/pretty
+ (only-in racket/path
+	  some-system-path->string
+	  find-relative-path)
+ (only-in "../../prelude/std/opt.rkt"
+	  opt-car)
  (only-in "../../prelude/type/date.rkt"
           current-date-string-rfc-2822)
  (only-in "../../httpclient/uri.rkt"
@@ -60,7 +66,9 @@
  (only-in "../configuration.rkt"
           s3-host)
  (only-in "types.rkt" 
-          Range Prefix Owner Bucket Buckets Keys Key)
+          Range Prefix Owner Bucket Buckets 
+	  Keys Keys-objects
+	  Key Key-key)
  (only-in "configuration.rkt"
           nss)
  (only-in "invoke.rkt"
@@ -153,20 +161,23 @@
     (let ((resp (s3-invoke 'GET bucket "" query '() #f)))
       (parse-response (sx-result (S3Response-sxml resp))))))
 
-(: s3-put-file-object (Path String String -> S3Response))
+(: s3-put-file-object (Path String (U Path String) -> S3Response))
 (define (s3-put-file-object local-file-path bucket s3-path)
-  (if (file-exists? local-file-path)
-      (let* ((length (assert (file-size local-file-path) index?))
-             (ip (open-input-file local-file-path))
-             (mime "binary/octet-stream")
-             (payload (HTTPPayload mime #f length ip)))
-        (with-handlers [(exn:fail? (lambda (ex)
-                                     (close-input-port ip)
-                                     (make-empty-error-response 500 (exn-message ex))))]
-          (s3-invoke 'PUT bucket s3-path #f '() payload)))
-      (make-empty-error-response 404 (string-append "File " 
-                                                    (path->string local-file-path)
-                                                    " does not exist to PUT"))))
+  (let ((s3-path (if (path? s3-path)
+		     (path->string s3-path)
+		     s3-path)))
+    (if (file-exists? local-file-path)
+	(let* ((length (assert (file-size local-file-path) index?))
+	       (ip (open-input-file local-file-path))
+	       (mime "binary/octet-stream")
+	       (payload (HTTPPayload mime #f length ip)))
+	  (with-handlers [(exn:fail? (lambda (ex)
+				       (close-input-port ip)
+				       (make-empty-error-response 500 (exn-message ex))))]
+	    (s3-invoke 'PUT bucket s3-path #f '() payload)))
+	(make-empty-error-response 404 (string-append "File " 
+						      (path->string local-file-path)
+						      " does not exist to PUT")))))
 
 (: s3-put-object (Bytes String String -> S3Response))
 (define (s3-put-object bytes bucket path)
@@ -194,3 +205,20 @@
 (define (s3-get-object-to-file bucket path file-path [range #f])
   (s3-get-object-pipe-to-file bucket path file-path range))
 
+(: s3-object-meta (String String String -> (Option Key)))
+(define (s3-object-meta bucket path fname)
+  
+  (define s3-rel-path 
+    (let ((path (string->path path)))
+      (if (absolute-path? path)
+	  (find-relative-path "/" path)
+	  path)))
+
+  (define s3-file (some-system-path->string (build-path s3-rel-path fname)))
+
+  (let ((keys (s3-list-bucket-objects bucket 
+				      s3-file
+				      "" "" 1)))
+    (opt-car (filter (λ: ((key : Key))
+			 (string=? (Key-key key) s3-file))
+		     (reverse (Keys-objects keys))))))
