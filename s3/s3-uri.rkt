@@ -20,14 +20,19 @@
 
 #| Helpers for S3 URI's, extracting buckets etc.|#
 
-(provide
- s3-uri-path->prefix)
+(provide:
+ [new-s3-uri (String String -> Uri)]
+ [s3-uri-path->prefix (String -> String)])
 
 (require 
  (only-in httpclient/uri
-          Uri Uri-scheme Uri-path)
+          Uri Uri-scheme Uri-path make-uri)
  (only-in httpclient/uri/path
           uri-path-split uri-build-path))
+
+(: new-s3-uri (String String -> Uri))
+(define (new-s3-uri bucket prefix)
+  (make-uri "s3" #f bucket #f (string-append "/" prefix) #f #f))
 
 (: s3-uri-path->prefix (String -> String))
 (define (s3-uri-path->prefix path)
