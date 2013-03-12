@@ -106,6 +106,13 @@ Obtains a session token valid for the given duration in seconds from the AWS STS
 
 @subsection{S3 API}
 
+@subsection{S3 URI}
+
+@defproc[(s3-uri-path->prefix [path String]) String]{
+S3 API prefixes are relative path strings to the bucket.  A URI path is absolute.
+Convert a S3 Uri, s3://mybucket/a/b/c, path, "/a/b/c" to a S3 prefix "a/b/c".
+}
+
 @subsection{S3 Bucket Types}
 
 @defstruct*[Buckets ([owner Owner] [buckets (Listof Bucket)]) #:transparent]{

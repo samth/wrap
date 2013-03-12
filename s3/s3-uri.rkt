@@ -21,8 +21,7 @@
 #| Helpers for S3 URI's, extracting buckets etc.|#
 
 (provide
- s3-path->prefix
- s3-uri-bucket-and-path)
+ s3-uri-path->prefix)
 
 (require 
  (only-in httpclient/uri
@@ -30,28 +29,10 @@
  (only-in httpclient/uri/path
           uri-path-split uri-build-path))
 
-(: s3-path->prefix (String -> String))
-(define (s3-path->prefix path)
+(: s3-uri-path->prefix (String -> String))
+(define (s3-uri-path->prefix path)
   (if (string=? path "")
       ""
       (if (string=? (substring path 0 1) "/")
           (substring path 1)
           path)))
-
-(: s3-uri-bucket-and-path (Uri -> (Values String String)))
-(define (s3-uri-bucket-and-path s3-uri)  
-  (let ((scheme (Uri-scheme s3-uri)))
-    (if (string=? scheme "s3")
-        (let ((path-segs (uri-path-split (Uri-path s3-uri))))          
-          (if (pair? path-segs)
-              (if (string=? (car path-segs) "")
-                  (let ((rootless-segs (cdr path-segs)))
-                    (if (pair? rootless-segs)                        
-                        (values (car rootless-segs)
-                                (uri-build-path (cons "" (cdr rootless-segs))))
-                        (values "" "")))
-                  (values "" ""))
-              (values "" "")))
-        (values "" ""))))
-
-
