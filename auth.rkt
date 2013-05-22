@@ -34,9 +34,9 @@
 	  base64-encode)
  (only-in crypto/hmac
 	  hmac-sha1 hmac-sha256)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
- (only-in httpclient/param
+ (only-in net/http/param
 	  params->query Param Params))
 
 (: ddb-base String)
@@ -51,15 +51,15 @@
 (: ddb-merge-params (Params -> Params))
 (define (ddb-merge-params params)
   (let: ((merged : (HashTable String String) (make-hash)))
-    (let: loop : Params ((params : Params params))
-      (if (null? params)
-	  (hash->list merged)
-	  (let ((param (car params)))
-	    (hash-update! merged (car param)
-			  (lambda: ((curr-value : String))
-			    (ddb-merge-value (cdr param) curr-value))
-			  (lambda () ""))
-	    (loop (cdr params)))))))
+	(let: loop : Params ((params : Params params))
+	      (if (null? params)
+		  (hash->list merged)
+		  (let ((param (car params)))
+		    (hash-update! merged (car param)
+				  (lambda: ((curr-value : String))
+					   (ddb-merge-value (cdr param) curr-value))
+				  (lambda () ""))
+		    (loop (cdr params)))))))
 
 (: ddb-canonicalize-headers (Params -> String))
 (define (ddb-canonicalize-headers params)

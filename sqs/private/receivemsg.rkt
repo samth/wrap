@@ -6,9 +6,9 @@
 (require
  (only-in net/uri/url/url
 	  QParam QParams add-qparam)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Headers make-header)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
  (only-in "invoke.rkt"
 	  SQSError sqs-invoke))

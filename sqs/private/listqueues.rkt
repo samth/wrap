@@ -16,9 +16,9 @@
  (only-in format/xml/sxml
 	  Sxml SXPath
 	  sxpath xml->sxml select-single-node-text)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  StatusLine)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Headers make-header)
  (only-in "invoke.rkt"
 	  SQSError sqs-invoke))

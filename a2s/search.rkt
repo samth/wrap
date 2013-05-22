@@ -6,11 +6,11 @@
 (require
  (only-in net/uri/url/url
 	  QParam QParams add-qparam merge-qparams)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  http-invoke)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Header
 	  Headers)
  (only-in "../credential.rkt"

@@ -8,17 +8,17 @@
  racket/pretty
  (only-in type/opt
 	  opt-get-orelse-value)
- (only-in httpclient/mimetype-const
+ (only-in net/http/mimetype-const
 	  X-WWW-FORM-URLENCODED)
  (only-in net/uri/url/url
 	  Url Url-path Authority
 	  qparams->string)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Headers make-header header->string content-type)
  (only-in net/uri/url/url
 	  QParam QParams
 	  Url Url-path url->string)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  HTTPConnection-in
 	  HTTPPayload http-invoke)
  (only-in format/xml/sxml

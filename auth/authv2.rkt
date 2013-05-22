@@ -13,7 +13,7 @@
  (only-in net/uri/url/url
 	  QParam QParams QParam-name
 	  add-qparam merge-qparams qparams->string)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
  (only-in crypto/base64
 	  base64-encode)

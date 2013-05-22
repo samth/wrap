@@ -8,12 +8,12 @@
  racket/match
  (only-in type/text
 	  weave-string-separator)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Header Headers
 	  Header-name
 	  make-header header-lowercase-name
 	  header->string)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
  (only-in crypto/hash/sha256
 	  sha256)

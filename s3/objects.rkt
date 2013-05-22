@@ -39,9 +39,9 @@
  (only-in net/uri/url/url
 	  QParam QParams
 	  Url Url-path url->string)
- (only-in httpclient/heading
+ (only-in net/http/heading
 	  DATE HOST)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Header
 	  header->string
 	  make-header
@@ -50,7 +50,7 @@
 	  content-length
 	  content-type
 	  content-md5)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  ResponseHeader HTTPPayload
 	  HTTPConnection-in HTTPConnection-header
 	  http-invoke http-close-connection make-client-error-response)

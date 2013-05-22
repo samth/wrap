@@ -29,11 +29,11 @@
 	  Url Authority)
  (only-in net/uri/url/show
 	  url->path-query-fragment-string)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Header Headers host-header header->string)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  http-invoke HTTPConnection-in)
  (only-in type/date
 	  current-date-string-iso-8601)

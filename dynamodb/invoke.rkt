@@ -25,19 +25,19 @@
 	  pretty-print)
  (only-in type/control
 	  aif)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
  (only-in net/uri/url/url
 	  Authority
 	  Url Url-query parse-url url->string)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  HTTPPayload HTTPConnection-in
 	  http-status StatusLine-code StatusLine-msg
 	  http-successful? http-has-content?
 	  http-close-connection http-invoke)
- (only-in httpclient/param
+ (only-in net/http/param
 	  param Param Params encode-param)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Header Headers make-header)
  (only-in type/date
 	  current-date-string-rfc-2822
@@ -73,7 +73,7 @@
    ;; Below for Dynamodb.
    (make-header "Content-Type" "application/x-amz-json-1.0")
    ;; For Workflow
-   ;(make-header "Content-Type" "application/json; charset=UTF-8")
+					;(make-header "Content-Type" "application/json; charset=UTF-8")
    (make-header "Connection" "Close")))
 
 (: date-header (-> Header))
@@ -90,10 +90,10 @@
 
 (: dynamodb-invoke (Url Headers String -> JsObject))
 (define (dynamodb-invoke url headers payload)
- ; (with-handlers ([exn:fail?
- ;                  (lambda (ex)
- ;                    (pretty-print ex)
- ;                    (raise ex #t))])
+					; (with-handlers ([exn:fail?
+					;                  (lambda (ex)
+					;                    (pretty-print ex)
+					;                    (raise ex #t))])
   (let ((conn (http-invoke 'POST url headers
 			   (HTTPPayload "application/x-amz-json-1.0"
 					#f #f (open-input-string payload)))))
@@ -104,9 +104,9 @@
 	      ;;(pretty-print json)
 	      (if (hash? json)
 		  (let: ((json : JsObject (cast json JsObject)))
-		    (if (is-exception-response? json)
-			(aws-failure json)
-			json))
+			(if (is-exception-response? json)
+			    (aws-failure json)
+			    json))
 		  (error "Invalid DynamoDB response: not a Json Object")))
 	    (jsobject '()))
 	(let ((status (http-status conn)))
@@ -146,18 +146,18 @@
 (: make-service-invoker (String -> (String JsObject -> Json)))
 (define (make-service-invoker host)
   (λ: ((target : String) (payload : JsObject))
-    (if (ensure-session)
-	(let* ((scred (let ((scred (AwsCredential-session (current-aws-credential))))
-			(if scred scred (error "Failure to obtain session credentials"))))
-	       (stok (SessionCredential-token scred)))
-	  (let ((url (Url 'HTTP (Authority #f host 80) "/" '() #f))
-		(auth-hdrs (auth-headers target stok))
-		(payload (json->string payload)))
-	    (let* ((auth (authorization-header host auth-hdrs payload scred))
-		   (hdrs (cons auth auth-hdrs))
-		   (shdrs (append hdrs request-headers)))
-	      (dynamodb-invoke url shdrs payload))))
-	(error "Failed to obtain a valid session token"))))
+      (if (ensure-session)
+	  (let* ((scred (let ((scred (AwsCredential-session (current-aws-credential))))
+			  (if scred scred (error "Failure to obtain session credentials"))))
+		 (stok (SessionCredential-token scred)))
+	    (let ((url (Url 'HTTP (Authority #f host 80) "/" '() #f))
+		  (auth-hdrs (auth-headers target stok))
+		  (payload (json->string payload)))
+	      (let* ((auth (authorization-header host auth-hdrs payload scred))
+		     (hdrs (cons auth auth-hdrs))
+		     (shdrs (append hdrs request-headers)))
+		(dynamodb-invoke url shdrs payload))))
+	  (error "Failed to obtain a valid session token"))))
 
 
 ;; FIXME RPR - NEED TO VERIFY DYNAMODB ALWAYS RESPONDS WITH A JSOBJECT
@@ -166,4 +166,4 @@
 
 (: workflow (String JsObject -> JsObject))
 (define workflow (λ: ((target : String) (payload : JsObject))
-		   (json->jsobject (workflow-invoker target payload))))
+		     (json->jsobject (workflow-invoker target payload))))

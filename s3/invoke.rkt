@@ -33,9 +33,9 @@
 	  Url Authority Url-path)
  (only-in type/date
 	  current-date-string-rfc-2822)
- (only-in httpclient/heading
+ (only-in net/http/heading
 	  DATE HOST)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Header Headers
 	  header->string
 	  make-header
@@ -43,7 +43,7 @@
 	  content-length
 	  content-type
 	  content-md5)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  Method HTTPPayload HTTPPayload-md5 HTTPPayload-mime
 	  http-method->string http-status-code http-has-content?
 	  ResponseHeader-status StatusLine
@@ -82,13 +82,13 @@
 
 (: make-base-uri ((Option String) String QParams -> Url))
 (define (make-base-uri bucket path qparams)
-  
+
   (: make-bucket-host (-> String))
   (define (make-bucket-host)
     (if bucket
 	(string-append bucket "." s3-host)
 	s3-host))
-    
+
   (Url 'HTTP (Authority #f (make-bucket-host) 80) path qparams #f))
 
 (: authorization-header (AwsCredential String -> Header))
@@ -123,30 +123,30 @@
 	       (headers (if range (cons (range-header range) core-headers) core-headers)))
 	  (let ((connection (http-invoke 'GET url headers #f)))
 	    (with-handlers [(exn:fail? (λ (ex)
-					  ((error-display-handler) "ERROR in S3 Object GET" ex)
-					  (http-close-connection connection)
-					  (S3Response (StatusLine 'HTTP/1.1 500
-								  (exn-message ex))
-						      empty-response)))]
-	      (if (http-has-content? connection)
-		  (call-with-output-file
-		      file-path
-		    (λ: ((outp : Output-Port))
-			(let* ((inp (HTTPConnection-in connection))
-			       (buffer (make-bytes buff-sz)))
-			  (let: loop : S3Response ((bs : (U EOF Integer) (read-bytes! buffer inp)))
-				(if (eof-object? bs)
-				    (begin
-				      (http-close-connection connection)
-				      (S3Response (StatusLine 'HTTP/1.1 200 "OK") empty-response))
-				    (begin
-				      (write-bytes buffer outp zero bs)
-				      (loop (read-bytes! buffer inp)))))))
-		    #:mode 'binary
-		    #:exists 'error)
-		  (S3Response (StatusLine 'HTTP/1.1 500
-					  "S3 GET of object returned no content")
-			      empty-response)))))
+					 ((error-display-handler) "ERROR in S3 Object GET" ex)
+					 (http-close-connection connection)
+					 (S3Response (StatusLine 'HTTP/1.1 500
+								 (exn-message ex))
+						     empty-response)))]
+			   (if (http-has-content? connection)
+			       (call-with-output-file
+				   file-path
+				 (λ: ((outp : Output-Port))
+				     (let* ((inp (HTTPConnection-in connection))
+					    (buffer (make-bytes buff-sz)))
+				       (let: loop : S3Response ((bs : (U EOF Integer) (read-bytes! buffer inp)))
+					     (if (eof-object? bs)
+						 (begin
+						   (http-close-connection connection)
+						   (S3Response (StatusLine 'HTTP/1.1 200 "OK") empty-response))
+						 (begin
+						   (write-bytes buffer outp zero bs)
+						   (loop (read-bytes! buffer inp)))))))
+				 #:mode 'binary
+				 #:exists 'error)
+			       (S3Response (StatusLine 'HTTP/1.1 500
+						       "S3 GET of object returned no content")
+					   empty-response)))))
 	(S3Response (StatusLine 'HTTP/1.1 400
 				(string-append "Bad Request - Malformed URL"))
 		    empty-response))))
@@ -166,16 +166,16 @@
 	       (headers (if range (cons (range-header range) core-headers) core-headers)))
 	  (let ((connection (http-invoke 'GET url headers #f)))
 	    (with-handlers [(exn:fail? (λ (ex)
-					  ((error-display-handler) "ERROR in S3 Object GET" ex)
-					  (http-close-connection connection)
-					  (S3Response (StatusLine 'HTTP/1.1 500
-								  (exn-message ex))
-						      empty-response)))]
-	      (if (http-has-content? connection)
-		  (let ((bytes (port->bytes (HTTPConnection-in connection))))
-		    (http-close-connection connection)
-		    bytes)
-		  (bytes)))))
+					 ((error-display-handler) "ERROR in S3 Object GET" ex)
+					 (http-close-connection connection)
+					 (S3Response (StatusLine 'HTTP/1.1 500
+								 (exn-message ex))
+						     empty-response)))]
+			   (if (http-has-content? connection)
+			       (let ((bytes (port->bytes (HTTPConnection-in connection))))
+				 (http-close-connection connection)
+				 bytes)
+			       (bytes)))))
 	(S3Response (StatusLine 'HTTP/1.1 400
 				(string-append "Bad Request - Malformed URL"))
 		    empty-response))))
@@ -216,19 +216,19 @@
 										(exn-message ex)))
 						     empty-response)))]
 
-	      (if (http-has-content? connection)
-		  (cond
-		   ((eq? action 'HEAD)
-		    (http-close-connection connection)
-		    (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-				empty-response))
-		   (else
-		    (let ((results (xml->sxml (HTTPConnection-in connection) '())))
-		      (http-close-connection connection)
-		      (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-				  results))))
-		  (S3Response (ResponseHeader-status (HTTPConnection-header connection))
-			      empty-response)))))
+			   (if (http-has-content? connection)
+			       (cond
+				((eq? action 'HEAD)
+				 (http-close-connection connection)
+				 (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+					     empty-response))
+				(else
+				 (let ((results (xml->sxml (HTTPConnection-in connection) '())))
+				   (http-close-connection connection)
+				   (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+					       results))))
+			       (S3Response (ResponseHeader-status (HTTPConnection-header connection))
+					   empty-response)))))
 	(S3Response (StatusLine 'HTTP/1.1 400
 				(string-append "Bad Request - Malformed URL"))
 		    empty-response))))

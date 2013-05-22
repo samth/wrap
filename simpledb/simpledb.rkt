@@ -11,11 +11,11 @@
 	  Authority QParam QParams
 	  Url Url-query parse-url url->string
 	  qparams->string add-qparam merge-qparams)
- (only-in httpclient/encode
+ (only-in net/http/encode
 	  url-encode-string)
- (only-in httpclient/http11
+ (only-in net/http/http11
 	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in httpclient/header
+ (only-in net/http/header
 	  Headers make-header)
  (only-in format/xml/sxml
 	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
