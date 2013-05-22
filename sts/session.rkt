@@ -5,7 +5,7 @@
 
 (require
  racket/pretty
- (only-in "../../prelude/type/date.rkt"
+ (only-in type/date
           time< current-time)
  (only-in "../credential.rkt"
           set-aws-credential! add-session-credential

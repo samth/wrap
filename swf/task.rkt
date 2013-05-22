@@ -26,45 +26,45 @@
  poll-for-decision-task
  poll-for-activity-task)
 
-(require 
+(require
  racket/pretty
  (only-in racket/function
-          thunk)
- (only-in prelude/std/opt
-          opt-getorelse)
+	  thunk)
+ (only-in type/opt
+	  opt-get-orelse)
  (only-in format/json/tjson
-          JsObject Json json->string jsobject jsobject-opt)
+	  JsObject Json json->string jsobject jsobject-opt)
  (only-in "types.rkt"
-          WorkflowExecution 
-          WorkflowType ActivityType 
-          Input TaskToken)
+	  WorkflowExecution
+	  WorkflowType ActivityType
+	  Input TaskToken)
  (only-in "attrs.rkt"
-          parse-workflow-type
-          parse-workflow-execution)
+	  parse-workflow-type
+	  parse-workflow-execution)
  (only-in "history.rkt"
-          HistoryEvent
+	  HistoryEvent
 	  parse-history-events)
- (only-in "../dynamodb/parse.rkt"          
-          attr-value-jsobject attr-value-jslist
-          attr-value-integer attr-value-integer-opt
-          attr-value-string attr-value-string-opt)
+ (only-in "../dynamodb/parse.rkt"
+	  attr-value-jsobject attr-value-jslist
+	  attr-value-integer attr-value-integer-opt
+	  attr-value-string attr-value-string-opt)
  (only-in "../dynamodb/invoke.rkt"
-          workflow))
+	  workflow))
 
 (struct: ActivityTask ([id : String]
-                       [type : ActivityType]
-                       [input : (Option Input)]
-                       [started-event-id : Integer]
-                       [token : TaskToken]
-                       [workflow : WorkflowExecution]) #:transparent)
+		       [type : ActivityType]
+		       [input : (Option Input)]
+		       [started-event-id : Integer]
+		       [token : TaskToken]
+		       [workflow : WorkflowExecution]) #:transparent)
 
 (struct: DecisionTask ([task-token : String]
-                       [events : (Listof HistoryEvent)]
-                       [next-page-token : (Option String)]
-                       [started-event-id : Integer]                      
-                       [previous-started-event-id : Integer]                       
-                       [workflow-execution : WorkflowExecution]
-                       [workflow-type : WorkflowType]) #:transparent)
+		       [events : (Listof HistoryEvent)]
+		       [next-page-token : (Option String)]
+		       [started-event-id : Integer]
+		       [previous-started-event-id : Integer]
+		       [workflow-execution : WorkflowExecution]
+		       [workflow-type : WorkflowType]) #:transparent)
 
 (define poll-for-activity-target "SimpleWorkflowService.PollForActivityTask")
 (define poll-for-decision-target "SimpleWorkflowService.PollForDecisionTask")
@@ -83,19 +83,19 @@
     (let ((activity (attr-value-jsobject response 'activityType)))
       (ActivityType (attr-value-string activity 'name)
 		    (attr-value-string activity 'version))))
-  
+
   (: parse-workflow-execution (-> WorkflowExecution))
   (define (parse-workflow-execution)
     (let ((wf (attr-value-jsobject response 'workflowExecution)))
       (WorkflowExecution (attr-value-string wf 'workflowId)
-			 (attr-value-string wf 'runId))))  
-  
+			 (attr-value-string wf 'runId))))
+
   (let ((started-event-id (attr-value-integer response 'startedEventId)))
     (if (no-available-activity response) ;; timedout with no activity received
-        #f
-        (ActivityTask (attr-value-string response 'activityId)
+	#f
+	(ActivityTask (attr-value-string response 'activityId)
 		      (parse-activity-type)
-                      (attr-value-string-opt response 'input)
+		      (attr-value-string-opt response 'input)
 		      (attr-value-integer response 'startedEventId)
 		      (attr-value-string response 'taskToken)
 		      (parse-workflow-execution)))))
@@ -104,8 +104,8 @@
 (: poll-for-activity-task (String (Option String) String -> (Option ActivityTask)))
 (define (poll-for-activity-task domain identity task-list)
   (let ((payload (jsobject-opt `((domain . ,domain)
-                                 (identity . ,identity)
-                                 (taskList . ,(jsobject `((name . ,task-list))))))))
+				 (identity . ,identity)
+				 (taskList . ,(jsobject `((name . ,task-list))))))))
     (parse-activity-task-response (workflow poll-for-activity-target payload))))
 
 #| Decision Task API |#
@@ -114,26 +114,26 @@
   (if (no-available-activity jsobj)
       #f
       (DecisionTask (attr-value-string jsobj 'taskToken)
-                    (parse-history-events (attr-value-jslist jsobj 'events))
-                    (attr-value-string-opt jsobj 'nextPageToken)
-                    (attr-value-integer jsobj 'startedEventId)
-                    (opt-getorelse (attr-value-integer-opt jsobj 'previousStartedEventId)
-                                   (thunk (attr-value-integer jsobj 'startedEventId)))
-                    (parse-workflow-execution (attr-value-jsobject jsobj 'workflowExecution))
-                    (parse-workflow-type (attr-value-jsobject jsobj 'workflowType)))))
+		    (parse-history-events (attr-value-jslist jsobj 'events))
+		    (attr-value-string-opt jsobj 'nextPageToken)
+		    (attr-value-integer jsobj 'startedEventId)
+		    (opt-get-orelse (attr-value-integer-opt jsobj 'previousStartedEventId)
+				   (thunk (attr-value-integer jsobj 'startedEventId)))
+		    (parse-workflow-execution (attr-value-jsobject jsobj 'workflowExecution))
+		    (parse-workflow-type (attr-value-jsobject jsobj 'workflowType)))))
 
 ;; AWS long polls, so a call will "hang" for 60 secs prior to returning.
 (: poll-for-decision-task (case-> (String String -> (Option DecisionTask))
-                                  (String String String (Option Integer) String Boolean -> (Option DecisionTask))))
-(define (poll-for-decision-task domain task-list 
-                                [identity ""] 
-                                [max-page-size #f] 
-                                [next-page-token ""] 
-                                [reverse-order #f])
-  (parse-decision-task-response (workflow poll-for-decision-target 
-                                          (jsobject-opt `((domain . ,domain)
-                                                          (identity . ,identity)
-                                                          (maximumPageSize . ,max-page-size)
-                                                          (nextPageToken . ,next-page-token)
-                                                          (reverseOrder . ,reverse-order)
-                                                          (taskList . ,(jsobject `((name . ,task-list)))))))))
+				  (String String String (Option Integer) String Boolean -> (Option DecisionTask))))
+(define (poll-for-decision-task domain task-list
+				[identity ""]
+				[max-page-size #f]
+				[next-page-token ""]
+				[reverse-order #f])
+  (parse-decision-task-response (workflow poll-for-decision-target
+					  (jsobject-opt `((domain . ,domain)
+							  (identity . ,identity)
+							  (maximumPageSize . ,max-page-size)
+							  (nextPageToken . ,next-page-token)
+							  (reverseOrder . ,reverse-order)
+							  (taskList . ,(jsobject `((name . ,task-list)))))))))

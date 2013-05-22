@@ -6,42 +6,42 @@
 
 (require
  racket/pretty
- (only-in prelude/std/opt
-          opt-map)
- (only-in httpclient/uri/guid
-          guid)
+ (only-in type/opt
+	  opt-map)
+ (only-in net/uuid
+	  uuid)
  (only-in format/json/tjson
-          JsObject jsobject jsobject-opt) 
+	  JsObject jsobject jsobject-opt)
  (only-in "types.rkt"
 	  WorkflowExecution
-          VersionedType-name VersionedType-version
-          WorkflowType ChildPolicy Duration)
+	  VersionedType-name VersionedType-version
+	  WorkflowType ChildPolicy Duration)
  (only-in "attrs.rkt"
-          queue->jsobject
-          policy->attr
-          duration->attr)
+	  queue->jsobject
+	  policy->attr
+	  duration->attr)
  (only-in "../dynamodb/invoke.rkt"
-          workflow)
+	  workflow)
  (only-in "../dynamodb/parse.rkt"
-          attr-value-string))
+	  attr-value-string))
 
 (define register-workflow-target "SimpleWorkflowService.RegisterWorkflowType")
 
 #| Register a Workflow |#
 
 ;; WARNING - Call with care.  The SWF API has NO mechanism to delete a registered workflow.
-(: register-workflow (case-> 
-                      (String String String -> Void)
-                      (String String String (Option String) (Option String) (Option Duration) (Option Duration) (Option ChildPolicy) -> Void)))
+(: register-workflow (case->
+		      (String String String -> Void)
+		      (String String String (Option String) (Option String) (Option Duration) (Option Duration) (Option ChildPolicy) -> Void)))
 (define (register-workflow domain name version [description #f] [task-queue #f] [max-task-time #f] [max-time #f] [child-policy #f])
   (let ((payload (jsobject-opt `((domain . ,domain)
-                                 (name . ,name)
-                                 (version . ,version)    
-                                 (description . ,description)
-                                 (defaultTaskList . ,(queue->jsobject task-queue))
-                                 (defaultExecutionStartToCloseTimeout . ,(duration->attr max-time))
-                                 (defaultTaskStartToCloseTimeout . ,(duration->attr max-task-time))
-                                 (defaultChildPolicy . ,(policy->attr child-policy))))))
+				 (name . ,name)
+				 (version . ,version)
+				 (description . ,description)
+				 (defaultTaskList . ,(queue->jsobject task-queue))
+				 (defaultExecutionStartToCloseTimeout . ,(duration->attr max-time))
+				 (defaultTaskStartToCloseTimeout . ,(duration->attr max-task-time))
+				 (defaultChildPolicy . ,(policy->attr child-policy))))))
     (workflow register-workflow-target payload)
     (void)))
 
@@ -53,7 +53,7 @@
 (define (parse-start-workflow-execution-response wid jsobj)
   (WorkflowExecution wid (attr-value-string jsobj 'runId)))
 
-(: start-workflow-execution (String WorkflowType 
+(: start-workflow-execution (String WorkflowType
 				    [#:id String]
 				    [#:policy (Option ChildPolicy)]
 				    [#:execution-timeout (Option Natural)]
@@ -62,14 +62,14 @@
 				    [#:tags (Listof String)]
 				    [#:queue String] -> WorkflowExecution))
 (define (start-workflow-execution domain workflow-type
-                                  #:id [id (guid)]
-                                  #:policy [child-policy #f] 
-                                  #:execution-timeout [execution-timeout #f]
-                                  #:task-timeout [task-timeout #f]
-                                  #:input [input ""] 
-                                  #:tags [tag-list '()]
-                                  #:queue [task-queue ""])
-  (parse-start-workflow-execution-response id  (workflow start-workflow-execution-target 
+				  #:id [id (uuid)]
+				  #:policy [child-policy #f]
+				  #:execution-timeout [execution-timeout #f]
+				  #:task-timeout [task-timeout #f]
+				  #:input [input ""]
+				  #:tags [tag-list '()]
+				  #:queue [task-queue ""])
+  (parse-start-workflow-execution-response id  (workflow start-workflow-execution-target
 							 (jsobject-opt `((domain . ,domain)
 									 (workflowId . ,id)
 									 (workflowType . ,(jsobject `((name . ,(VersionedType-name workflow-type))
@@ -85,35 +85,35 @@
 
 (define terminate-workflow-execution-target "SimpleWorkflowService.TerminateWorkflowExecution")
 
-(: terminate-workflow-execution (String String 
-                                        [#:run-id String]
-                                        [#:policy (Option ChildPolicy)]
-                                        [#:details String]
-                                        [#:reason String] -> Void))
-(define (terminate-workflow-execution domain workflow-id 
-                                      #:run-id [run-id ""]
-                                      #:policy [child-policy #f]
-                                      #:details [details ""]
-                                      #:reason [reason ""])
+(: terminate-workflow-execution (String String
+					[#:run-id String]
+					[#:policy (Option ChildPolicy)]
+					[#:details String]
+					[#:reason String] -> Void))
+(define (terminate-workflow-execution domain workflow-id
+				      #:run-id [run-id ""]
+				      #:policy [child-policy #f]
+				      #:details [details ""]
+				      #:reason [reason ""])
   (pretty-print workflow-id)
   (pretty-print run-id)
   (workflow terminate-workflow-execution-target
-            (jsobject-opt `((domain . ,domain)
-                            (workflowId . ,workflow-id)
-                            (runId . ,run-id)
-                            (childPolicy . ,(policy->attr child-policy))
-                            (details . ,details)
-                            (reason . ,reason))))
+	    (jsobject-opt `((domain . ,domain)
+			    (workflowId . ,workflow-id)
+			    (runId . ,run-id)
+			    (childPolicy . ,(policy->attr child-policy))
+			    (details . ,details)
+			    (reason . ,reason))))
   (void))
 
 #| Request cancelling a Workflow - soft kill, a request to the decider to terminate |#
 
 (define request-cancel-workflow-execution-target "SimpleWorkflowService.RequestCancelWorkflowExecution")
 
-(: request-cancel-workflow-execution (String String [#:run-id String] -> Void))                                             
+(: request-cancel-workflow-execution (String String [#:run-id String] -> Void))
 (define (request-cancel-workflow-execution domain workflow-id #:run-id [run-id ""])
   (workflow request-cancel-workflow-execution-target
-            (jsobject-opt `((domain . ,domain)
-                            (workflowId . ,workflow-id)
-                            (runId . ,run-id))))
+	    (jsobject-opt `((domain . ,domain)
+			    (workflowId . ,workflow-id)
+			    (runId . ,run-id))))
   (void))

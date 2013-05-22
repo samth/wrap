@@ -21,23 +21,21 @@
 #| Helpers for S3 URI's, extracting buckets etc.|#
 
 (provide:
- [new-s3-uri (String String -> Uri)]
+ [new-s3-uri (String String -> Url)]
  [s3-uri-path->prefix (String -> String)])
 
-(require 
- (only-in httpclient/uri
-          Uri Uri-scheme Uri-path make-uri)
- (only-in httpclient/uri/path
-          uri-path-split uri-build-path))
+(require
+ (only-in net/uri/url/url
+	  Url Authority))
 
-(: new-s3-uri (String String -> Uri))
+(: new-s3-uri (String String -> Url))
 (define (new-s3-uri bucket prefix)
-  (make-uri "s3" #f bucket #f (string-append "/" prefix) #f #f))
+  (Url "s3" (Authority #f bucket #f) (string-append "/" prefix) '() #f))
 
 (: s3-uri-path->prefix (String -> String))
 (define (s3-uri-path->prefix path)
   (if (string=? path "")
       ""
       (if (string=? (substring path 0 1) "/")
-          (substring path 1)
-          path)))
+	  (substring path 1)
+	  path)))

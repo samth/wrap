@@ -22,7 +22,7 @@
  list-buckets)
 
 (require
- (only-in "../../format/xml/sxml.rkt"
+ (only-in format/xml/sxml
           Sxml SXPath 
           sxpath xml->sxml select-single-node-text)
  (only-in "types.rkt" 
@@ -72,16 +72,16 @@
             (Buckets owner buckets))
           (error "S3 call failed"))))
   
-  (let ((resp (s3-invoke 'GET #f "/" #f '() #f)))
+  (let ((resp (s3-invoke 'GET #f "/" '() '() #f)))
     (parse-response (S3Response-sxml resp))))
 
 (: bucket-create (String -> S3Response))
 (define (bucket-create bucket)
-  (s3-invoke 'PUT bucket "/" #f '() #f))
+  (s3-invoke 'PUT bucket "/" '() '() #f))
 
 (: bucket-delete (String -> S3Response))
 (define (bucket-delete bucket)
-  (s3-invoke 'DELETE bucket "/" #f '() #f))
+  (s3-invoke 'DELETE bucket "/" '() '() #f))
 
 (: bucket-policy (String -> S3Response))
 (define (bucket-policy bucket)

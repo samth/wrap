@@ -39,12 +39,12 @@
 
 (require/typed racket/base
 	       ((read read-creds) (Input-Port -> (Listof (Pair Symbol String)))))
- 
-(require 
- (only-in "../prelude/std/opt.rkt"
-          opt-apply-orelse)
- (only-in "../prelude/type/date.rkt"
-          Time))
+
+(require
+ (only-in type/opt
+	  opt-apply-orelse)
+ (only-in type/date
+	  Time))
 
 (struct: BaseCredential ((access-key : String)
 			 (secret-key : String)) #:transparent)
@@ -54,8 +54,8 @@
    [expiration : Time]) #:transparent)
 
 (struct: AwsCredential BaseCredential ([account-id    : String]
-                                       [associate-tag : String]
-                                       [session       : (Option SessionCredential)]) #:mutable #:transparent)
+				       [associate-tag : String]
+				       [session       : (Option SessionCredential)]) #:mutable #:transparent)
 
 (: add-session-credential (SessionCredential -> AwsCredential))
 (define (add-session-credential session-cred)
@@ -75,14 +75,14 @@
 
 (: load-credential (Path -> AwsCredential))
 (define (load-credential fpath)
-  
+
   (define lookup (inst assoc Symbol String))
   (define value  (inst cdr Symbol String))
 
   (: cred-value (Symbol (Listof (Pair Symbol String)) -> String))
   (define (cred-value sym props)
     (opt-apply-orelse  (lookup sym props) value  ""))
-  
+
   (call-with-input-file fpath
     (lambda: ((ip : Input-Port))
       (let: ((props : (Listof (Pair Symbol String))(read-creds ip)))

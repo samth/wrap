@@ -4,7 +4,7 @@
  parse-session-response)
 
 (require
- (only-in "../../prelude/type/date.rkt"
+ (only-in type/date
           date->time-utc iso-8601-date-string->date)
  (only-in "../../format/xml/sxml.rkt"
           Sxml SXPath sxpath extract-text extract-integer)

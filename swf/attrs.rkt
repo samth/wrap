@@ -24,32 +24,32 @@
  [parse-workflow-type (JsObject -> WorkflowType)]
  [parse-workflow-execution (JsObject -> WorkflowExecution)]
  [parse-workflow-type (JsObject -> WorkflowType)]
- [queue->jsobject ((Option String) -> Json)] 
+ [queue->jsobject ((Option String) -> Json)]
  [policy->attr ((Option ChildPolicy) -> (Option String))]
  [duration->attr ((Option Duration) -> (Option String))])
 
 (require
- (only-in prelude/std/opt
-          opt-map)
+ (only-in type/opt
+	  opt-map)
  (only-in format/json/tjson
-          Json JsObject JsList jsobject-opt)          
+	  Json JsObject JsList jsobject-opt)
  (only-in "../dynamodb/parse.rkt"
-          attr-value-real
-          attr-value-integer
-          attr-value-string
-          attr-value-jsobject)
+	  attr-value-real
+	  attr-value-integer
+	  attr-value-string
+	  attr-value-jsobject)
  (only-in "types.rkt"
-          WorkflowExecution
-          WorkflowType ChildPolicy Duration))
+	  WorkflowExecution
+	  WorkflowType ChildPolicy Duration))
 
 #| Serialization helpers for API calls |#
 
 (: duration->attr ((Option Duration) -> (Option String)))
 (define (duration->attr duration)
   (opt-map duration (λ: ((duration : Duration))
-                      (if (number? duration)
-                          (number->string duration)
-                          (symbol->string duration)))))
+		      (if (number? duration)
+			  (number->string duration)
+			  (symbol->string duration)))))
 
 (: policy->attr ((Option ChildPolicy) -> (Option String)))
 (define (policy->attr policy)
@@ -64,9 +64,8 @@
 (: parse-workflow-type (JsObject -> WorkflowType))
 (define (parse-workflow-type jsobj)
   (WorkflowType (attr-value-string jsobj 'name)
-                (attr-value-string jsobj 'version)))
+		(attr-value-string jsobj 'version)))
 
 (: parse-workflow-execution (JsObject -> WorkflowExecution))
 (define (parse-workflow-execution jsobj)
   (WorkflowExecution (attr-value-string jsobj 'workflowId) (attr-value-string jsobj 'runId)))
-

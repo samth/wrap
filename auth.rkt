@@ -23,21 +23,21 @@
  ddb-request-signature)
 
 (require/typed srfi/13
-               (string-trim-both (String -> String)))
+	       (string-trim-both (String -> String)))
 
 (require
  (only-in racket/pretty
-          pretty-print)
- (only-in "../prelude/text/util.rkt"
-          weave-string-separator)
- (only-in "../crypto/base64.rkt"
-          base64-encode)
- (only-in "../crypto/hmac.rkt"
-          hmac-sha1 hmac-sha256)
- (only-in "../httpclient/uri/url/encode.rkt"
-          url-encode-string)
- (only-in "../httpclient/uri/url/param.rkt"
-          params->query Param Params))
+	  pretty-print)
+ (only-in type/text
+	  weave-string-separator)
+ (only-in crypto/base64
+	  base64-encode)
+ (only-in crypto/hmac
+	  hmac-sha1 hmac-sha256)
+ (only-in httpclient/encode
+	  url-encode-string)
+ (only-in httpclient/param
+	  params->query Param Params))
 
 (: ddb-base String)
 (define ddb-base "POST\n/\n\n")
@@ -53,21 +53,21 @@
   (let: ((merged : (HashTable String String) (make-hash)))
     (let: loop : Params ((params : Params params))
       (if (null? params)
-          (hash->list merged)
-          (let ((param (car params)))
-            (hash-update! merged (car param) 
-                          (lambda: ((curr-value : String))
-                            (ddb-merge-value (cdr param) curr-value))
-                          (lambda () ""))
-            (loop (cdr params)))))))
+	  (hash->list merged)
+	  (let ((param (car params)))
+	    (hash-update! merged (car param)
+			  (lambda: ((curr-value : String))
+			    (ddb-merge-value (cdr param) curr-value))
+			  (lambda () ""))
+	    (loop (cdr params)))))))
 
 (: ddb-canonicalize-headers (Params -> String))
 (define (ddb-canonicalize-headers params)
-  
+
   (: lower-case-key (Param -> Param))
   (define (lower-case-key param)
     (cons (string-downcase (car param)) (cdr param)))
-  
+
   (let ((lparams (map lower-case-key params)))
     (params->query lparams)))
 
@@ -79,8 +79,8 @@
 (: ddb-auth-mac-encode (String String -> String))
 (define (ddb-auth-mac-encode key str)
   (url-encode-string (string-trim-both (base64-encode (hmac-sha256 (string->bytes/utf-8 key)
-                                                                   (string->bytes/utf-8 str))))
-                     #f))
+								   (string->bytes/utf-8 str))))
+		     #f))
 
 (: ddb-request-signature (String (Listof (Pair String String)) String -> String))
 (define (ddb-request-signature key params body)
@@ -90,14 +90,14 @@
 (define (aws-auth-str verb md5 mime expiration amz-headers resource)
   (let ((sep "\n"))
     (if (null? amz-headers)
-        (weave-string-separator sep (list verb md5 mime expiration resource))
-        (weave-string-separator sep (list verb md5 mime expiration 
-                                          (weave-string-separator sep amz-headers) resource)))))
+	(weave-string-separator sep (list verb md5 mime expiration resource))
+	(weave-string-separator sep (list verb md5 mime expiration
+					  (weave-string-separator sep amz-headers) resource)))))
 
 (: aws-auth-mac (String String -> String))
 (define (aws-auth-mac key str)
   (string-trim-both (base64-encode (hmac-sha1 (string->bytes/utf-8 key)
-                                              (string->bytes/utf-8 str)))))
+					      (string->bytes/utf-8 str)))))
 
 (: aws-auth-mac-encode (String String -> String))
 (define (aws-auth-mac-encode key str)

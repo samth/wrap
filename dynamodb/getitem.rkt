@@ -18,41 +18,41 @@
 
 #lang typed/racket/base
 
-(provide 
+(provide
  get-item GetItemResp GetItemResp? GetItemResp-items GetItemResp-consumed)
 
 (require
  (only-in "../../format/json/tjson.rkt"
-          JsObject-empty
-          Json JsObject json->string string->json jsobject
-          jsobject-add-attribute jsobject-remove-attribute)
- (only-in "../../prelude/std/opt.rkt"
-          opt-orelse)
+	  JsObject-empty
+	  Json JsObject json->string string->json jsobject
+	  jsobject-add-attribute jsobject-remove-attribute)
+ (only-in type/opt
+	  opt-orelse)
  (only-in "types.rkt"
-          ddbtype-symbol DDBType
-          Item
-          Key Key? Key-name Key-type
-          KeyVal KeyVal? KeyVal-value KeyVal-type
-          ItemKey)
+	  ddbtype-symbol DDBType
+	  Item
+	  Key Key? Key-name Key-type
+	  KeyVal KeyVal? KeyVal-value KeyVal-type
+	  ItemKey)
  (only-in "action.rkt"
-          GET-ITEM)
+	  GET-ITEM)
  (only-in "invoke.rkt"
-          dynamodb)
+	  dynamodb)
  (only-in "request.rkt"
-          itemkey-json)
+	  itemkey-json)
  (only-in "response.rkt"
-          parse-consumed-capacity
-          parse-fail
-          parse-items))
+	  parse-consumed-capacity
+	  parse-fail
+	  parse-items))
 
 (struct: GetItemResp ([items : (HashTable String Item)] [consumed : Float]) #:transparent)
 
 (: get-item-request (String ItemKey (Listof String) Boolean -> String))
 (define (get-item-request table key attrs consistent?)
   (let ((req (jsobject `((TableName . ,table)
-                         (Key . ,(itemkey-json key))
-                         (AttributesToGet . ,attrs)
-                         (ConsistentRead . ,(if consistent? "true" "false"))))))
+			 (Key . ,(itemkey-json key))
+			 (AttributesToGet . ,attrs)
+			 (ConsistentRead . ,(if consistent? "true" "false"))))))
     (when (null? attrs)
       (jsobject-remove-attribute req 'AttributesToGet))
     (json->string req)))
@@ -62,8 +62,8 @@
   (let ((req (get-item-request table item-key attrs consistent?)))
     (let ((resp (dynamodb GET-ITEM req)))
       (if (hash? resp)
-          (parse-get-item-resp (cast resp JsObject))
-          (error "Invalid response ~a" resp)))))
+	  (parse-get-item-resp (cast resp JsObject))
+	  (error "Invalid response ~a" resp)))))
 
 ;;; Parse Response
 
@@ -71,9 +71,8 @@
 (define (parse-get-item-resp resp)
   (if (hash-has-key? resp 'ConsumedCapacityUnits)
       (let ((jconsumed (parse-consumed-capacity resp)))
-        (let ((items (hash-ref resp 'Item (lambda: () JsObject-empty))))
-          (if (hash? items)
-              (GetItemResp (parse-items (cast items JsObject)) jconsumed)
-              (parse-fail resp))))
+	(let ((items (hash-ref resp 'Item (lambda: () JsObject-empty))))
+	  (if (hash? items)
+	      (GetItemResp (parse-items (cast items JsObject)) jconsumed)
+	      (parse-fail resp))))
       (parse-fail resp)))
-
