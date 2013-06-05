@@ -19,13 +19,19 @@
 #lang typed/racket/base
 
 (provide
- Range
- s3-get-object s3-get-object-to-file s3-head-object s3-object-meta
- s3-put-object s3-delete-object
- s3-put-file-object)
+ Range)
 
 (provide:
- [s3-list-bucket-objects (String String String String Natural -> Keys)])
+ [s3-list-objects (String String String String Natural -> Keys)]
+ [s3-put-object (Bytes String String -> S3Response)]
+ [s3-delete-object (String String -> S3Response)]
+ [s3-object-meta (String String String -> (Option Key))]
+ [s3-head-object (String String -> S3Response)]
+ [s3-put-file-object (Path String (U Path String) -> S3Response)]
+ [s3-get-object (case-> (String String -> (U S3Response Bytes))
+			(String String (Option Range) -> (U S3Response Bytes)))]
+ [s3-get-object-to-file (case-> (String String Path -> S3Response)
+				(String String Path (Option Range) -> S3Response))])
 
 (require
  racket/pretty
@@ -79,8 +85,8 @@
 
 ;; FIXME Use opt-map to create the parameter query string
 
-(: s3-list-bucket-objects (String String String String Natural -> Keys))
-(define (s3-list-bucket-objects bucket prefix delimiter marker max)
+(: s3-list-objects (String String String String Natural -> Keys))
+(define (s3-list-objects bucket prefix delimiter marker max)
 
   (: s->i (String -> (Option Integer)))
   (define (s->i s)
@@ -214,7 +220,7 @@
 
   (define s3-file (some-system-path->string (build-path s3-rel-path fname)))
 
-  (let ((keys (s3-list-bucket-objects bucket
+  (let ((keys (s3-list-objects bucket
 				      s3-file
 				      "" "" 1)))
     (opt-car (filter (λ: ((key : Key))
