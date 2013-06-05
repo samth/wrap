@@ -23,22 +23,22 @@
 (provide
  AWSFailure
  malformed-response
- ;throw 
+					;throw
  is-exception-response? aws-failure)
 
-(require 
- (only-in "../../format/json/tjson.rkt"
-          Json JsObject json->string string->json jsobject))
+(require
+ (only-in gut/format/json/tjson
+	  Json JsObject json->string string->json jsobject))
 
 (struct: AWSFailure exn:fail ([type : String]) #:transparent)
 
 (define unknown-msg "Unknown error message type: ")
 (define ill-formed-msg "Unparsable error response")
 
-;(define-syntax throw
-;  (syntax-rules ()
-;    ((throw excn)
-;     (raise (ddb-failure excn #t)))))
+					;(define-syntax throw
+					;  (syntax-rules ()
+					;    ((throw excn)
+					;     (raise (ddb-failure excn #t)))))
 
 (: is-exception-response? (JsObject -> Boolean))
 (define (is-exception-response? jsobj)
@@ -50,13 +50,12 @@
   (raise (AWSFailure resp (current-continuation-marks) "MalformedJSON")))
 
 (: aws-failure (JsObject -> Nothing))
-(define (aws-failure jsobj)      
+(define (aws-failure jsobj)
   (if (is-exception-response? jsobj)
       (let ((type (hash-ref jsobj '__type))
-            (msg  (hash-ref jsobj 'message)))
-        (if (and (string? type)
-                 (string? msg))
-            (raise (AWSFailure msg (current-continuation-marks) type))
-            (malformed-response (json->string jsobj))))
+	    (msg  (hash-ref jsobj 'message)))
+	(if (and (string? type)
+		 (string? msg))
+	    (raise (AWSFailure msg (current-continuation-marks) type))
+	    (malformed-response (json->string jsobj))))
       (malformed-response (json->string jsobj))))
-

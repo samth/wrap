@@ -28,14 +28,14 @@
 (require
  (only-in racket/port
 	  port->bytes)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  QParams qparams->string
 	  Url Authority Url-path)
- (only-in type/date
+ (only-in grip/data/date
 	  current-date-string-rfc-2822)
- (only-in net/http/heading
+ (only-in gut/http/heading
 	  DATE HOST)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Header Headers
 	  header->string
 	  make-header
@@ -43,13 +43,13 @@
 	  content-length
 	  content-type
 	  content-md5)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  Method HTTPPayload HTTPPayload-md5 HTTPPayload-mime
 	  http-method->string http-status-code http-has-content?
 	  ResponseHeader-status StatusLine
 	  HTTPConnection-in HTTPConnection-header
 	  http-invoke http-close-connection )
- (only-in format/xml/sxml
+ (only-in gut/format/xml/sxml
 	  Sxml
 	  xml->sxml)
  (only-in "../credential.rkt"

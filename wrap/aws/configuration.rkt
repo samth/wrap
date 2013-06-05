@@ -2,9 +2,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Simple storage of configuration values.
-;; we could have multiple configuration maps 
+;; we could have multiple configuration maps
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(provide 
+(provide
  s3-host
  a2s-host a2s-path a2s-ns a2s-nss)
 

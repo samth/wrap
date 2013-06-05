@@ -4,20 +4,20 @@
  authv2-signature)
 
 (require
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-get-orelse-value)
- (only-in type/date
+ (only-in grip/data/date
 	  current-date-string-iso-8601)
- (only-in type/text
+ (only-in grip/data/text
 	  weave-string-separator)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  QParam QParams QParam-name
 	  add-qparam merge-qparams qparams->string)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
- (only-in crypto/base64
+ (only-in grommet/crypto/base64
 	  base64-encode)
- (only-in crypto/hmac
+ (only-in grommet/crypto/hmac
 	  hmac-sha256)
  (only-in "../credential.rkt"
 	  BaseCredential-secret-key BaseCredential-access-key current-aws-credential))

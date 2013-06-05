@@ -26,7 +26,7 @@
  [parse-history-events (JsList -> (Listof HistoryEvent))])
 
 (require
- (only-in format/json/tjson
+ (only-in gut/format/json/tjson
           JsObject JsList)
  (only-in "../dynamodb/parse.rkt"
           attr-value-real

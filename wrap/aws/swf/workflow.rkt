@@ -6,11 +6,11 @@
 
 (require
  racket/pretty
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-map)
- (only-in net/uuid
+ (only-in gut/uuid/uuid
 	  uuid)
- (only-in format/json/tjson
+ (only-in gut/format/json/tjson
 	  JsObject jsobject jsobject-opt)
  (only-in "types.rkt"
 	  WorkflowExecution

@@ -30,9 +30,9 @@
  racket/pretty
  (only-in racket/function
 	  thunk)
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-get-orelse)
- (only-in format/json/tjson
+ (only-in gut/format/json/tjson
 	  JsObject Json json->string jsobject jsobject-opt)
  (only-in "types.rkt"
 	  WorkflowExecution

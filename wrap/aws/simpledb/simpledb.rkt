@@ -5,19 +5,19 @@
 
 (require
  racket/pretty
- (only-in type/control
+ (only-in grip/control/control
 	  aif)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  Authority QParam QParams
 	  Url Url-query parse-url url->string
 	  qparams->string add-qparam merge-qparams)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Headers make-header)
- (only-in format/xml/sxml
+ (only-in gut/format/xml/sxml
 	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
  (only-in "../credential.rkt"
 	  BaseCredential-secret-key BaseCredential-access-key current-aws-credential)

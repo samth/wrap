@@ -4,14 +4,14 @@
  parse-session-response)
 
 (require
- (only-in type/date
-          date->time-utc iso-8601-date-string->date)
- (only-in "../../format/xml/sxml.rkt"
-          Sxml SXPath sxpath extract-text extract-integer)
+ (only-in grip/data/date
+	  date->time-utc iso-8601-date-string->date)
+ (only-in gut/format/xml/sxml
+	  Sxml SXPath sxpath extract-text extract-integer)
  (only-in "../credential.rkt"
-          SessionCredential current-aws-credential)
+	  SessionCredential current-aws-credential)
  (only-in "config.rkt"
-          sts-ns))
+	  sts-ns))
 
 (: mk-sxpath (String -> SXPath))
 (define mk-sxpath
@@ -19,7 +19,7 @@
     (lambda (path)
       (sxpath path sts-nss))))
 
-(define sx-session-result-creds 
+(define sx-session-result-creds
   (mk-sxpath "/sts:GetSessionTokenResponse/sts:GetSessionTokenResult/sts:Credentials"))
 (define sx-session-token        (mk-sxpath "/sts:SessionToken/text()"))
 (define sx-session-access-key   (mk-sxpath "/sts:AccessKeyId/text()"))

@@ -26,17 +26,15 @@
 	       (string-trim-both (String -> String)))
 
 (require
- (only-in racket/pretty
-	  pretty-print)
- (only-in type/text
+ (only-in grip/data/text
 	  weave-string-separator)
- (only-in crypto/base64
+ (only-in grommet/crypto/base64
 	  base64-encode)
- (only-in crypto/hmac
+ (only-in grommet/crypto/hmac
 	  hmac-sha1 hmac-sha256)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
- (only-in net/http/param
+ (only-in gut/http/param
 	  params->query Param Params))
 
 (: ddb-base String)

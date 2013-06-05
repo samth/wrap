@@ -41,17 +41,17 @@
 	       ((read read-creds) (Input-Port -> (Listof (Pair Symbol String)))))
 
 (require
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-apply-orelse)
- (only-in type/date
+ (only-in grip/data/date
 	  Time))
 
 (struct: BaseCredential ((access-key : String)
 			 (secret-key : String)) #:transparent)
 
 (struct: SessionCredential BaseCredential
-  ([token      : String]
-   [expiration : Time]) #:transparent)
+	 ([token      : String]
+	  [expiration : Time]) #:transparent)
 
 (struct: AwsCredential BaseCredential ([account-id    : String]
 				       [associate-tag : String]
@@ -85,12 +85,12 @@
 
   (call-with-input-file fpath
     (lambda: ((ip : Input-Port))
-      (let: ((props : (Listof (Pair Symbol String))(read-creds ip)))
-	(AwsCredential (cred-value 'access-key props)
-		       (cred-value 'secret-key props)
-		       (cred-value 'account-id props)
-		       (cred-value 'associate-tag props)
-		       #f)))))
+	     (let: ((props : (Listof (Pair Symbol String))(read-creds ip)))
+		   (AwsCredential (cred-value 'access-key props)
+				  (cred-value 'secret-key props)
+				  (cred-value 'account-id props)
+				  (cred-value 'associate-tag props)
+				  #f)))))
 
 (: current-aws-credential (Parameterof AwsCredential))
 (define current-aws-credential (make-parameter (init-aws-credential default-cred-path)))

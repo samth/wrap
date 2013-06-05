@@ -20,74 +20,74 @@
 
 (provide create-table CreateTableResp)
 
-(require 
+(require
  racket/pretty
- (only-in "../../format/json/tjson.rkt"
-          Json JsObject jsobject json->string) 
+ (only-in gut/format/json/tjson
+	  Json JsObject jsobject json->string)
  (only-in "types.rkt"
-          Throughput-write Throughput-read Throughput Throughput?
-          DDBType ddbtype-code)
+	  Throughput-write Throughput-read Throughput Throughput?
+	  DDBType ddbtype-code)
  (only-in "error.rkt"
-          AWSFailure)          
+	  AWSFailure)
  (only-in "action.rkt"
-          CREATE-TABLE)
+	  CREATE-TABLE)
  (only-in "types.rkt"
-          TableStatus string->TableStatus
-          Throughput KeySchema
-          Key Key? Key-name Key-type)
+	  TableStatus string->TableStatus
+	  Throughput KeySchema
+	  Key Key? Key-name Key-type)
  (only-in "invoke.rkt"
-          dynamodb)
+	  dynamodb)
  (only-in "parse.rkt"
-          invalid-error parse-capacity
-          attr-value attr-value-jsobject parse-key-schema))
+	  invalid-error parse-capacity
+	  attr-value attr-value-jsobject parse-key-schema))
 
 (struct: CreateTableResp ([name : String]
-                          [status : TableStatus]
-                          [creation : Float]
-                          [capacity : Throughput]
-                          [schema : KeySchema]) #:transparent)
+			  [status : TableStatus]
+			  [creation : Float]
+			  [capacity : Throughput]
+			  [schema : KeySchema]) #:transparent)
 
 (: create-request (String Key (Option Key) Throughput -> String))
 (define (create-request name hash-key range-key throughput)
-  
+
   (: keys-json (Key (Option Key) -> JsObject))
   (define (keys-json hash-key range-key)
-    
+
     (: key-json (Key -> JsObject))
     (define (key-json key)
       (jsobject `((AttributeName . ,(Key-name key))
-                  (AttributeType . ,(ddbtype-code (Key-type key))))))
-    
+		  (AttributeType . ,(ddbtype-code (Key-type key))))))
+
     (let: ((keys : JsObject (jsobject '())))
-      (hash-set! keys 'HashKeyElement (key-json hash-key))
-      (when range-key
-        (hash-set! keys 'RangeKeyElement (key-json range-key)))
-      keys))
-  
+	  (hash-set! keys 'HashKeyElement (key-json hash-key))
+	  (when range-key
+		(hash-set! keys 'RangeKeyElement (key-json range-key)))
+	  keys))
+
   (: throughput-json (Throughput -> JsObject))
   (define (throughput-json throughput)
     (jsobject `((ReadCapacityUnits . ,(Throughput-read throughput))
-                (WriteCapacityUnits . ,(Throughput-write throughput)))))
-  
+		(WriteCapacityUnits . ,(Throughput-write throughput)))))
+
   (json->string (jsobject `((TableName . ,name)
-                            (KeySchema . ,(keys-json hash-key range-key))
-                            (ProvisionedThroughput . ,(throughput-json throughput))))))
+			    (KeySchema . ,(keys-json hash-key range-key))
+			    (ProvisionedThroughput . ,(throughput-json throughput))))))
 
 (: create-table (String Key (Option Key) Throughput -> CreateTableResp))
-(define (create-table name hash-key range-key throughput) 
-  (let ((result (dynamodb CREATE-TABLE (create-request name hash-key range-key throughput))))    
+(define (create-table name hash-key range-key throughput)
+  (let ((result (dynamodb CREATE-TABLE (create-request name hash-key range-key throughput))))
     (parse-create-table-resp result)))
 
 (: parse-create-table-resp (Json -> CreateTableResp))
 (define (parse-create-table-resp resp)
   (if (hash? resp)
       (let: ((resp : JsObject (cast resp JsObject)))
-        (let ((desc (attr-value-jsobject resp 'TableDescription)))
-          (let ((name (attr-value desc 'TableName string?))
-                (schema (parse-key-schema (attr-value-jsobject desc 'KeySchema)))
-                (creation (attr-value desc 'CreationDateTime flonum?))
-                (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput)))
-                (status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
-                          (if status status (invalid-error 'TablesStatus desc)))))
-            (CreateTableResp name status creation capacity schema))))
+	    (let ((desc (attr-value-jsobject resp 'TableDescription)))
+	      (let ((name (attr-value desc 'TableName string?))
+		    (schema (parse-key-schema (attr-value-jsobject desc 'KeySchema)))
+		    (creation (attr-value desc 'CreationDateTime flonum?))
+		    (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput)))
+		    (status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
+			      (if status status (invalid-error 'TablesStatus desc)))))
+		(CreateTableResp name status creation capacity schema))))
       (raise (invalid-error 'TableDescription resp))))

@@ -25,7 +25,7 @@
  [s3-uri-path->prefix (String -> String)])
 
 (require
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  Url Authority))
 
 (: new-s3-uri (String String -> Url))

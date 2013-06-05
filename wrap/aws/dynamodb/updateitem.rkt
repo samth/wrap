@@ -1,24 +1,24 @@
 #lang typed/racket/base
 
-(provide 
+(provide
  update-item UpdateItemResp)
 
 (require
  racket/pretty
- (only-in "../../format/json/tjson.rkt"
-          Json JsObject jsobject json->string)
+ (only-in gut/format/json/tjson
+	  Json JsObject jsobject json->string)
  (only-in "action.rkt"
-          UPDATE-ITEM)
+	  UPDATE-ITEM)
  (only-in "types.rkt"
-          Action action->string ddbtype-symbol
-          KeyVal Item 
-          ItemVal ItemVal-value ItemVal-type
-          ItemUpdate ItemUpdate-name ItemUpdate-action ItemUpdate-value 
-          ItemKey Exists ReturnValues)
+	  Action action->string ddbtype-symbol
+	  KeyVal Item
+	  ItemVal ItemVal-value ItemVal-type
+	  ItemUpdate ItemUpdate-name ItemUpdate-action ItemUpdate-value
+	  ItemKey Exists ReturnValues)
  (only-in "invoke.rkt"
-          dynamodb)
+	  dynamodb)
  (only-in "request.rkt"
-          return-values-json item-json itemkey-json))
+	  return-values-json item-json itemkey-json))
 
 (struct: UpdateItemResp ())
 
@@ -27,22 +27,22 @@
   (let ((attrs `((Action . ,(action->string (ItemUpdate-action item))))))
     (let ((value (ItemUpdate-value item)))
       (if value
-          (jsobject (cons `(Value . ,(jsobject `((,(ddbtype-symbol (ItemVal-type value)) . ,(ItemVal-value value))))) attrs))
-          (jsobject attrs)))))
+	  (jsobject (cons `(Value . ,(jsobject `((,(ddbtype-symbol (ItemVal-type value)) . ,(ItemVal-value value))))) attrs))
+	  (jsobject attrs)))))
 
 (: itemupdates-json ((Listof ItemUpdate) -> JsObject))
 (define (itemupdates-json updates)
   (jsobject ((inst map (Pairof Symbol Json) ItemUpdate)
-             (lambda: ((item : ItemUpdate))
-               `(,(string->symbol (ItemUpdate-name item)) . ,(itemupdate-json item)))
-             updates)))
+	     (lambda: ((item : ItemUpdate))
+		      `(,(string->symbol (ItemUpdate-name item)) . ,(itemupdate-json item)))
+	     updates)))
 
 (: update-item-request (String ItemKey (Option (U Exists Item)) (Listof ItemUpdate) ReturnValues -> String))
 (define (update-item-request table item-key expected attrs return-values)
   (let ((req (jsobject `((TableName . , table)
-                         (Key . ,(itemkey-json item-key))
-                         (AttributeUpdates . ,(itemupdates-json attrs))
-                         (ReturnValues . ,(return-values-json return-values))))))
+			 (Key . ,(itemkey-json item-key))
+			 (AttributeUpdates . ,(itemupdates-json attrs))
+			 (ReturnValues . ,(return-values-json return-values))))))
     (json->string req)))
 
 (: update-item (String ItemKey (Option (U Exists Item)) (Listof ItemUpdate) ReturnValues -> UpdateItemResp))

@@ -32,16 +32,16 @@
  (only-in racket/path
 	  some-system-path->string
 	  find-relative-path)
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-car)
- (only-in type/date
+ (only-in grip/data/date
 	  current-date-string-rfc-2822)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  QParam QParams
 	  Url Url-path url->string)
- (only-in net/http/heading
+ (only-in gut/http/heading
 	  DATE HOST)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Header
 	  header->string
 	  make-header
@@ -50,15 +50,15 @@
 	  content-length
 	  content-type
 	  content-md5)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  ResponseHeader HTTPPayload
 	  HTTPConnection-in HTTPConnection-header
 	  http-invoke http-close-connection make-client-error-response)
- (only-in crypto/base64
+ (only-in grommet/crypto/base64
 	  base64-encode)
- (only-in crypto/hash/md5
+ (only-in grommet/crypto/hash/md5
 	  md5-bytes)
- (only-in format/xml/sxml
+ (only-in gut/format/xml/sxml
 	  Sxml SXPath
 	  sxpath xml->sxml select-single-node-text)
  (only-in "../configuration.rkt"

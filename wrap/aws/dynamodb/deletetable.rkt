@@ -18,44 +18,43 @@
 
 #lang typed/racket/base
 
-(provide 
+(provide
  delete-table
  DeleteTableResp DeleteTableResp?)
 
 (require
  racket/pretty
- (only-in "../../format/json/tjson.rkt"
-          Json JsObject json->string jsobject)
+ (only-in gut/format/json/tjson
+	  Json JsObject json->string jsobject)
  (only-in "types.rkt"
-          Throughput
-          TableStatus string->TableStatus)
+	  Throughput
+	  TableStatus string->TableStatus)
  (only-in "error.rkt"
-          AWSFailure)	  
+	  AWSFailure)
  (only-in "action.rkt"
-          DELETE-TABLE)
+	  DELETE-TABLE)
  (only-in "invoke.rkt"
-          dynamodb)
+	  dynamodb)
  (only-in "parse.rkt"
-          invalid-error attr-value attr-value-jsobject parse-capacity))
+	  invalid-error attr-value attr-value-jsobject parse-capacity))
 
 (struct: DeleteTableResp ([name : String]
-                          [status : TableStatus]
-                          [capacity : Throughput]) #:transparent)
+			  [status : TableStatus]
+			  [capacity : Throughput]) #:transparent)
 
 (: delete-table (String -> DeleteTableResp))
 (define (delete-table name)
-  (let ((result (dynamodb DELETE-TABLE (format "{\"TableName\": ~s}" name))))    
+  (let ((result (dynamodb DELETE-TABLE (format "{\"TableName\": ~s}" name))))
     (parse-delete-table-resp result)))
 
 (: parse-delete-table-resp (Json -> DeleteTableResp))
 (define (parse-delete-table-resp resp)
   (if (hash? resp)
       (let: ((resp : JsObject (cast resp JsObject)))
-        (let ((desc (attr-value-jsobject resp 'TableDescription)))
-          (let ((status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
-                          (if status status (invalid-error 'TableStatus resp))))
-                (name (attr-value desc 'TableName string?))
-                (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput))))
-            (DeleteTableResp name status capacity))))
+	    (let ((desc (attr-value-jsobject resp 'TableDescription)))
+	      (let ((status (let ((status (string->TableStatus (attr-value desc 'TableStatus string?))))
+			      (if status status (invalid-error 'TableStatus resp))))
+		    (name (attr-value desc 'TableName string?))
+		    (capacity (parse-capacity (attr-value-jsobject desc 'ProvisionedThroughput))))
+		(DeleteTableResp name status capacity))))
       (raise (invalid-error 'DeleteTable resp))))
-

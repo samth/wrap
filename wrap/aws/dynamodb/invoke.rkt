@@ -23,26 +23,26 @@
 (require
  (only-in racket/pretty
 	  pretty-print)
- (only-in type/control
+ (only-in grip/control/control
 	  aif)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  Authority
 	  Url Url-query parse-url url->string)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  HTTPPayload HTTPConnection-in
 	  http-status StatusLine-code StatusLine-msg
 	  http-successful? http-has-content?
 	  http-close-connection http-invoke)
- (only-in net/http/param
+ (only-in gut/http/param
 	  param Param Params encode-param)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Header Headers make-header)
- (only-in type/date
+ (only-in grip/data/date
 	  current-date-string-rfc-2822
 	  current-date-string-iso-8601)
- (only-in format/json/tjson
+ (only-in gut/format/json/tjson
 	  Json JsObject jsobject
 	  json->jsobject json->string
 	  read-json write-json)

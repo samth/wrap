@@ -24,10 +24,10 @@
  [respond-activity-task-completed (String String -> Void)])
 
 (require
- (only-in format/json/tjson
-          JsObject jsobject jsobject-opt)
+ (only-in gut/format/json/tjson
+	  JsObject jsobject jsobject-opt)
  (only-in "../dynamodb/invoke.rkt"
-          workflow))
+	  workflow))
 
 (define respond-activity-task-completed-target "SimpleWorkflowService.RespondActivityTaskCompleted")
 
@@ -36,6 +36,3 @@
   (workflow respond-activity-task-completed-target (jsobject `((result . ,result)
 							       (taskToken . ,task-token))))
   (void))
-  
-
-

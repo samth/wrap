@@ -5,16 +5,16 @@
 
 (require
  racket/pretty
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  Url url->string)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  HTTPConnection-in http-successful? http-close-connection http-invoke)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  Url Authority
 	  QParam QParams qparams->string)
- (only-in format/xml/sxml
+ (only-in gut/format/xml/sxml
 	  Sxml SXPath sxpath xml->sxml extract-text extract-integer)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Headers make-header)
  (only-in "../credential.rkt"
 	  SessionCredential SessionCredential?)

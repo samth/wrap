@@ -8,17 +8,17 @@
  ListQueuesResp-result)
 
 (require
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-map-orelse-value)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  QParam QParams
 	  Url Url-path url->string)
- (only-in format/xml/sxml
+ (only-in gut/format/xml/sxml
 	  Sxml SXPath
 	  sxpath xml->sxml select-single-node-text)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  StatusLine)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Headers make-header)
  (only-in "invoke.rkt"
 	  SQSError sqs-invoke))

@@ -29,9 +29,9 @@
  [duration->attr ((Option Duration) -> (Option String))])
 
 (require
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-map)
- (only-in format/json/tjson
+ (only-in gut/format/json/tjson
 	  Json JsObject JsList jsobject-opt)
  (only-in "../dynamodb/parse.rkt"
 	  attr-value-real

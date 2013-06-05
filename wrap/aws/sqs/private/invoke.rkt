@@ -6,22 +6,22 @@
 
 (require
  racket/pretty
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-get-orelse-value)
- (only-in net/http/mimetype-const
+ (only-in gut/http/mimetype-const
 	  X-WWW-FORM-URLENCODED)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  Url Url-path Authority
 	  qparams->string)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Headers make-header header->string content-type)
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  QParam QParams
 	  Url Url-path url->string)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  HTTPConnection-in
 	  HTTPPayload http-invoke)
- (only-in format/xml/sxml
+ (only-in gut/format/xml/sxml
 	  Sxml SXPath sxpath html->sxml xml->sxml extract-text extract-integer)
  (only-in "../../auth/authv2.rkt"
 	  authv2-signature)

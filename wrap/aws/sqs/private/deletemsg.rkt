@@ -4,9 +4,9 @@
  delete-message)
 
 (require
- (only-in net/http/header
+ (only-in gut/http/header
 	  Headers make-header)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
  (only-in "invoke.rkt"
 	  SQSError sqs-invoke))

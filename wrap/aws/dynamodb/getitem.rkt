@@ -22,11 +22,11 @@
  get-item GetItemResp GetItemResp? GetItemResp-items GetItemResp-consumed)
 
 (require
- (only-in "../../format/json/tjson.rkt"
+ (only-in gut/format/json/tjson
 	  JsObject-empty
 	  Json JsObject json->string string->json jsobject
 	  jsobject-add-attribute jsobject-remove-attribute)
- (only-in type/opt
+ (only-in grip/data/opt
 	  opt-orelse)
  (only-in "types.rkt"
 	  ddbtype-symbol DDBType

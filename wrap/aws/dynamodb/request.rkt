@@ -2,7 +2,7 @@
 
 ;; Common functions to build a request
 
-(provide 
+(provide
  item-json items-json
  keyvalue-json
  expected/exists-json
@@ -11,16 +11,16 @@
  itemkey-json)
 
 (require
- (only-in  "../../format/json/tjson.rkt"
-           Json JsObject json->string string->json 
-           jsobject jsobject-add-attribute)
+ (only-in  gut/format/json/tjson
+	   Json JsObject json->string string->json
+	   jsobject jsobject-add-attribute)
  (only-in "types.rkt"
-          Exists Exists? Exists-name Exists-exists
-          Item Item? Item-name Item-type Item-value
-          ddbtype-symbol
-          ReturnValues
-          KeyVal KeyVal-type KeyVal-value
-          ItemKey ItemKey-hashkey ItemKey-rangekey))
+	  Exists Exists? Exists-name Exists-exists
+	  Item Item? Item-name Item-type Item-value
+	  ddbtype-symbol
+	  ReturnValues
+	  KeyVal KeyVal-type KeyVal-value
+	  ItemKey ItemKey-hashkey ItemKey-rangekey))
 
 (: keyvalue-json (KeyVal -> JsObject))
 (define (keyvalue-json keyval)
@@ -30,8 +30,8 @@
 (define (itemkey-json item-key)
   (let ((jsobj (jsobject `((HashKeyElement . ,(keyvalue-json (ItemKey-hashkey item-key)))))))
     (let ((rnge-key (ItemKey-rangekey item-key)))
-      (when rnge-key 
-	(jsobject-add-attribute jsobj 'RangeKeyElement (keyvalue-json rnge-key))))
+      (when rnge-key
+	    (jsobject-add-attribute jsobj 'RangeKeyElement (keyvalue-json rnge-key))))
     jsobj))
 
 (: return-values-json (ReturnValues -> String))
@@ -58,7 +58,7 @@
 
 (: expected/exists-json ((U Exists Item) -> JsObject))
 (define (expected/exists-json expected)
-  (cond 
+  (cond
    ((Item? expected)   (expected-json expected))
    ((Exists? expected) (exists-json expected))))
 

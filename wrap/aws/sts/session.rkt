@@ -4,20 +4,19 @@
  ensure-session)
 
 (require
- racket/pretty
- (only-in type/date
-          time< current-time)
+ (only-in grip/data/date
+	  time< current-time)
  (only-in "../credential.rkt"
-          set-aws-credential! add-session-credential
-          current-aws-credential AwsCredential AwsCredential? AwsCredential-session 
-          SessionCredential SessionCredential? SessionCredential-expiration)
+	  set-aws-credential! add-session-credential
+	  current-aws-credential AwsCredential AwsCredential? AwsCredential-session
+	  SessionCredential SessionCredential? SessionCredential-expiration)
  (only-in "sts.rkt"
-          get-session-token))
+	  get-session-token))
 
 (: expired-token? (SessionCredential -> Boolean))
 (define (expired-token? creds)
   (let ((expiry (SessionCredential-expiration creds)))
-    (time< expiry (current-time))))	
+    (time< expiry (current-time))))
 
 (: refresh-token (-> Boolean))
 (define (refresh-token)
@@ -37,4 +36,3 @@
 	    (refresh-token)
 	    #t)
 	(refresh-token))))
-	    

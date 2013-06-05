@@ -4,13 +4,13 @@
 	 browse-node-search)
 
 (require
- (only-in net/uri/url/url
+ (only-in gut/uri/url/url
 	  QParam QParams add-qparam merge-qparams)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
- (only-in net/http/http11
+ (only-in gut/http/http11
 	  http-invoke)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Header
 	  Headers)
  (only-in "../credential.rkt"

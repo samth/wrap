@@ -6,20 +6,20 @@
 (require
  racket/pretty
  racket/match
- (only-in type/text
+ (only-in grip/data/text
 	  weave-string-separator)
- (only-in net/http/header
+ (only-in gut/http/header
 	  Header Headers
 	  Header-name
 	  make-header header-lowercase-name
 	  header->string)
- (only-in net/http/encode
+ (only-in gut/http/encode
 	  url-encode-string)
- (only-in crypto/hash/sha256
+ (only-in grommet/crypto/hash/sha256
 	  sha256)
- (only-in crypto/base64
+ (only-in grommet/crypto/base64
 	  base64-encode)
- (only-in crypto/hmac
+ (only-in grommet/crypto/hmac
 	  hmac-sha256)
  (only-in "../credential.rkt"
 	  AwsCredential-session BaseCredential-secret-key
