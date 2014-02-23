@@ -71,9 +71,9 @@
    (make-header "Accept-Encoding" "gzip")
 
    ;; Below for Dynamodb.
-   (make-header "Content-Type" "application/x-amz-json-1.0")
+   ;;(make-header "Content-Type" "application/x-amz-json-1.0")
    ;; For Workflow
-					;(make-header "Content-Type" "application/json; charset=UTF-8")
+   (make-header "Content-Type" "application/json; charset=UTF-8")
    (make-header "Connection" "Close")))
 
 (: date-header (-> Header))

@@ -42,7 +42,7 @@
 
 (: invoke-sts-get (All (a) (Url Headers (Sxml -> a) -> a)))
 (define (invoke-sts-get url headers resp-parser)
-  (let ((conn (http-invoke 'GET url headers #f)))
+  (let ((conn (http-invoke 'GET url headers #f)))    
     (let ((page (xml->sxml (HTTPConnection-in conn) '())))
       (http-close-connection conn)
       (resp-parser page))))

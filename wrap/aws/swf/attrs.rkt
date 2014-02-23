@@ -22,8 +22,7 @@
 
 (provide:
  [parse-workflow-type (JsObject -> WorkflowType)]
- [parse-workflow-execution (JsObject -> WorkflowExecution)]
- [parse-workflow-type (JsObject -> WorkflowType)]
+ [parse-workflow-execution (JsObject -> WorkflowExecution)] 
  [queue->jsobject ((Option String) -> Json)]
  [policy->attr ((Option ChildPolicy) -> (Option String))]
  [duration->attr ((Option Duration) -> (Option String))])

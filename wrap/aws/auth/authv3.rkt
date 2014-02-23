@@ -69,5 +69,5 @@
 		 (if scred scred (error "Missing session credentials")))))
     (let ((secret-key (BaseCredential-secret-key scred))
 	  (signee (auth-signee host params body)))
-      ;;(pretty-print signee)
+      (pretty-print signee)
       (base64-encode (hmac-sha256 secret-key (sha256 signee))))))
