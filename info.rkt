@@ -1,2 +1,2 @@
 #lang setup/infotab
-(define deps (list))
+(define deps (list "grip" "base"))
