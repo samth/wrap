@@ -175,7 +175,7 @@
 	       (ip (open-input-file local-file-path))
 	       (mime "binary/octet-stream")
 	       (payload (HTTPPayload mime #f length ip)))
-	  (with-handlers [(exn:fail? (lambda (ex)
+	  (with-handlers [(exn:fail? (lambda ([ex : exn])
 				       (close-input-port ip)
 				       (make-empty-error-response 500 (exn-message ex))))]
 			 (s3-invoke 'PUT bucket s3-path '() '() payload)))

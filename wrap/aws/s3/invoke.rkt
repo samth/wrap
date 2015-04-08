@@ -122,7 +122,7 @@
 									canonical-resource))))
 	       (headers (if range (cons (range-header range) core-headers) core-headers)))
 	  (let ((connection (http-invoke 'GET url headers #f)))
-	    (with-handlers [(exn:fail? (λ (ex)
+	    (with-handlers [(exn:fail? (λ ([ex : exn:fail])
 					 ((error-display-handler) "ERROR in S3 Object GET" ex)
 					 (http-close-connection connection)
 					 (S3Response (StatusLine 'HTTP/1.1 500
@@ -165,7 +165,7 @@
 								       canonical-resource))))
 	       (headers (if range (cons (range-header range) core-headers) core-headers)))
 	  (let ((connection (http-invoke 'GET url headers #f)))
-	    (with-handlers [(exn:fail? (λ (ex)
+	    (with-handlers [(exn:fail? (λ ([ex : exn:fail])
 					 ((error-display-handler) "ERROR in S3 Object GET" ex)
 					 (http-close-connection connection)
 					 (S3Response (StatusLine 'HTTP/1.1 500
@@ -207,7 +207,7 @@
 					 url
 					 (append core-headers headers)
 					 payload)))
-	    (with-handlers [(exn:fail? (lambda (ex)
+	    (with-handlers [(exn:fail? (lambda ([ex : exn:fail])
 					 ((error-display-handler) "ERROR in S3 invocation." ex)
 					 (displayln ex)
 					 (http-close-connection connection)
