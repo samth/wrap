@@ -1,3 +1,3 @@
 #lang setup/infotab
 (define name "aws")
-(define scribblings '(("scribblings/manual.scrbl" (multi-page))))
+(define scribblings '(("scribblings/wrap-aws.scrbl" (multi-page))))
