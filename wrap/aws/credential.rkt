@@ -76,7 +76,7 @@
 (: load-credential (Path -> AwsCredential))
 (define (load-credential fpath)
 
-  (define lookup (inst assoc Symbol String))
+  (define lookup assoc)
   (define value  (inst cdr Symbol String))
 
   (: cred-value (Symbol (Listof (Pair Symbol String)) -> String))
