@@ -12,13 +12,13 @@
 	       (error-display-handler (-> (String Any -> Any))))
 
 (require/typed
- (planet lizorkin/ssax:2:0/ssax)
+ sxml
  (ssax:xml->sxml (Input-Port (Listof String) -> (Listof Any))))
 
 (require
  (only-in grip/data/opt
 	  opt-get-orelse-value)
- (only-in (planet lizorkin/sxml:2:1/sxml)
+ (only-in sxml
 	  sxpath sxml:text srl:sxml->html)
  (only-in grip/data/text
 	  weave-string-separator)
